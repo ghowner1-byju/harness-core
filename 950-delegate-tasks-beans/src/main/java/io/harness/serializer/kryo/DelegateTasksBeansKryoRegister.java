@@ -41,6 +41,7 @@ import io.harness.delegate.beans.NotificationTaskResponse;
 import io.harness.delegate.beans.PagerDutyTaskParams;
 import io.harness.delegate.beans.RemoteMethodReturnValueData;
 import io.harness.delegate.beans.SecretDetail;
+import io.harness.delegate.beans.SerializedResponseData;
 import io.harness.delegate.beans.SlackTaskParams;
 import io.harness.delegate.beans.TaskData;
 import io.harness.delegate.beans.artifactory.ArtifactoryFetchBuildsResponse;
@@ -640,6 +641,7 @@ import software.wings.beans.LambdaTestEvent;
 import software.wings.beans.PerpetualTaskBroadcastEvent;
 import software.wings.beans.PhysicalDataCenterConfig;
 import software.wings.beans.PrometheusConfig;
+import software.wings.beans.SerializationFormat;
 import software.wings.beans.SettingAttribute;
 import software.wings.beans.SlackConfig;
 import software.wings.beans.SpotInstConfig;
@@ -1395,6 +1397,7 @@ public class DelegateTasksBeansKryoRegister implements KryoRegistrar {
     kryo.register(EmptyDirVolume.class, 543486);
     kryo.register(HostPathVolume.class, 543487);
     kryo.register(PVCVolume.class, 543488);
+
     kryo.register(AwsCFTemplateParamsData.class, 5478);
     kryo.register(PhysicalDataCenterConnectorValidationParams.class, 543489);
     kryo.register(ContainerSecurityContext.class, 543490);
@@ -1515,6 +1518,7 @@ public class DelegateTasksBeansKryoRegister implements KryoRegistrar {
     kryo.register(ArtifactoryBaseArtifactDelegateRequest.class, 563531);
     kryo.register(AzureK8sInfraDelegateConfig.class, 563532);
     kryo.register(AzureAcrTokenTaskResponse.class, 563533);
+
     kryo.register(LdapTestResponse.Status.class, 5500);
     kryo.register(LdapGroupSettings.class, 5498);
     kryo.register(LdapTestResponse.class, 5499);
@@ -1523,6 +1527,7 @@ public class DelegateTasksBeansKryoRegister implements KryoRegistrar {
     kryo.register(EcsRunTaskDeployRequest.class, 7501);
     kryo.register(EcsRunTaskDeployResponse.class, 7502);
     kryo.register(EcsDeployRollbackDataFetchResponse.class, 8087);
+
     kryo.register(SlackTaskParams.class, 55210);
     kryo.register(MailTaskParams.class, 55211);
     kryo.register(PagerDutyTaskParams.class, 55212);
@@ -1536,6 +1541,7 @@ public class DelegateTasksBeansKryoRegister implements KryoRegistrar {
     kryo.register(JenkinsCapabilityHelper.class, 29302);
     kryo.register(JenkinsValidationParams.class, 29303);
     kryo.register(JenkinsArtifactDelegateRequest.class, 29304);
+
     kryo.register(OciHelmConnectivityTaskParams.class, 29306);
     kryo.register(OciHelmConnectivityTaskResponse.class, 29307);
     kryo.register(OciHelmStoreDelegateConfig.class, 29308);
@@ -1571,5 +1577,8 @@ public class DelegateTasksBeansKryoRegister implements KryoRegistrar {
     kryo.register(AzureContainerArtifactConfig.class, 55325);
     kryo.register(AzureWebAppRollbackRequest.class, 55326);
     kryo.register(AzureWebAppNGRollbackResponse.class, 55327);
+
+    kryo.register(SerializedResponseData.class, 55401);
+    kryo.register(SerializationFormat.class, 55402);
   }
 }
