@@ -8,9 +8,11 @@
 package io.harness.delegate.task.servicenow;
 
 import static io.harness.rule.OwnerRule.PRABU;
+import static io.harness.rule.OwnerRule.vivekveman;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -88,7 +90,7 @@ public class ServiceNowTaskNGTest extends CategoryTest {
   }
 
   @Test
-  @Owner(developers = PRABU)
+  @Owner(developers = vivekveman)
   @Category(UnitTests.class)
   public void testisSupportingErrorFramework() {
     assertThat(serviceNowTaskNG.isSupportingErrorFramework()).isTrue();
