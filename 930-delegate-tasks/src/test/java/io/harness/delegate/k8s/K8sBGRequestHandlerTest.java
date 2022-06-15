@@ -230,7 +230,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
                                k8sBGDeployRequest, k8sDelegateTaskParams, logStreamingTaskClient, commandUnitsProgress))
         .isSameAs(runtimeException);
     verify(k8sBGRequestHandler, never())
-        .prepareForBlueGreen(any(K8sDelegateTaskParams.class), any(LogCallback.class), anyBoolean());
+        .prepareForBlueGreen(any(K8sDelegateTaskParams.class), any(LogCallback.class), anyBoolean(), false);
     verify(k8sTaskHelperBase, never())
         .saveReleaseHistoryInConfigMap(any(KubernetesConfig.class), anyString(), anyString());
   }
@@ -244,7 +244,9 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
     final RuntimeException thrownException = new RuntimeException("failed");
 
     doNothing().when(k8sBGRequestHandler).init(k8sBGDeployRequest, k8sDelegateTaskParams, logCallback);
-    doThrow(thrownException).when(k8sBGRequestHandler).prepareForBlueGreen(k8sDelegateTaskParams, logCallback, true);
+    doThrow(thrownException)
+        .when(k8sBGRequestHandler)
+        .prepareForBlueGreen(k8sDelegateTaskParams, logCallback, true, false);
 
     assertThatThrownBy(()
                            -> k8sBGRequestHandler.executeTaskInternal(
@@ -424,7 +426,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
     on(k8sBGRequestHandler).set("releaseHistory", releaseHistory);
     on(k8sBGRequestHandler).set("client", client);
 
-    k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false);
+    k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false, false);
 
     verify(k8sBGBaseHandler)
         .cleanupForBlueGreen(k8sDelegateTaskParams, releaseHistory, logCallback, HarnessLabelValues.colorGreen,
@@ -444,7 +446,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
   public void testPrepareForBlueGreenEmptyWorkloads() throws Exception {
     on(k8sBGRequestHandler).set("resources", emptyList());
 
-    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false))
+    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false, false))
         .matches(throwable -> {
           HintException hint = ExceptionUtils.cause(HintException.class, throwable);
           ExplanationException explanation = ExceptionUtils.cause(ExplanationException.class, throwable);
@@ -467,7 +469,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
   public void testPrepareForBlueGreenMultipleWorkloads() throws Exception {
     on(k8sBGRequestHandler).set("resources", asList(deployment(), deployment(), deployment()));
 
-    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, true))
+    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, true, false))
         .matches(throwable -> {
           HintException hint = ExceptionUtils.cause(HintException.class, throwable);
           ExplanationException explanation = ExceptionUtils.cause(ExplanationException.class, throwable);
@@ -492,7 +494,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
   public void testPrepareBlueGreenNoServicesInManifest() throws Exception {
     on(k8sBGRequestHandler).set("resources", singletonList(deployment()));
 
-    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false))
+    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false, false))
         .matches(throwable -> {
           HintException hint = ExceptionUtils.cause(HintException.class, throwable);
           ExplanationException explanation = ExceptionUtils.cause(ExplanationException.class, throwable);
@@ -510,7 +512,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
   public void testPrepareBlueGreenMultipleServicesInManifest() throws Exception {
     on(k8sBGRequestHandler).set("resources", asList(deployment(), service(), service()));
 
-    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false))
+    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false, false))
         .matches(throwable -> {
           HintException hint = ExceptionUtils.cause(HintException.class, throwable);
           ExplanationException explanation = ExceptionUtils.cause(ExplanationException.class, throwable);
@@ -535,7 +537,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
 
     doReturn(null).when(k8sBGBaseHandler).getPrimaryColor(primaryService, kubernetesConfig, logCallback);
 
-    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false))
+    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false, false))
         .matches(throwable -> {
           HintException hint = ExceptionUtils.cause(HintException.class, throwable);
           ExplanationException explanation = ExceptionUtils.cause(ExplanationException.class, throwable);
@@ -566,7 +568,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
     InvalidRequestException thrownException = new InvalidRequestException("Failed to get");
 
     doThrow(thrownException).when(kubernetesContainerService).getService(kubernetesConfig, "my-service-stage");
-    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false))
+    assertThatThrownBy(() -> k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false, false))
         .isSameAs(thrownException);
   }
 

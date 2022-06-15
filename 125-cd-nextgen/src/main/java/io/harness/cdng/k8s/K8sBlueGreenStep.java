@@ -123,6 +123,7 @@ public class K8sBlueGreenStep extends TaskChainExecutableWithRollbackAndRbac imp
             .commandUnitsProgress(UnitProgressDataMapper.toCommandUnitsProgress(unitProgressData))
             .useLatestKustomizeVersion(k8sStepHelper.isUseLatestKustomizeVersion(accountId))
             .useNewKubectlVersion(k8sStepHelper.isUseNewKubectlVersion(accountId))
+            .pruningEnabled(k8sStepHelper.isPruningEnabled(accountId))
             .build();
 
     k8sStepHelper.publishReleaseNameStepDetails(ambiance, releaseName);

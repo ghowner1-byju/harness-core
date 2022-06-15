@@ -66,7 +66,7 @@ public class K8sBGBaseHandler {
   @Inject K8sTaskHelperBase k8sTaskHelperBase;
   @Inject KubernetesContainerService kubernetesContainerService;
 
-  private String encodeColor(String color) {
+  public String encodeColor(String color) {
     switch (color) {
       case HarnessLabelValues.colorBlue:
         return color(color, Blue, Bold);
@@ -243,7 +243,7 @@ public class K8sBGBaseHandler {
     }
   }
 
-  private List<KubernetesResourceId> pruneInternalForStageRelease(K8sDelegateTaskParams k8sDelegateTaskParams,
+  public List<KubernetesResourceId> pruneInternalForStageRelease(K8sDelegateTaskParams k8sDelegateTaskParams,
       LogCallback executionLogCallback, Kubectl client, Set<KubernetesResourceId> resourcesUsedInPrimaryReleases,
       Set<KubernetesResourceId> resourcesInCurrentRelease, Set<KubernetesResourceId> alreadyDeletedResources,
       Release release) throws Exception {
@@ -291,7 +291,7 @@ public class K8sBGBaseHandler {
   }
 
   @NotNull
-  private Set<KubernetesResourceId> getResourcesUsedInPrimaryReleases(
+  public Set<KubernetesResourceId> getResourcesUsedInPrimaryReleases(
       ReleaseHistory releaseHistory, Release currentRelease, String primaryColor) {
     return releaseHistory.getReleases()
         .stream()
@@ -301,7 +301,7 @@ public class K8sBGBaseHandler {
         .collect(toSet());
   }
 
-  private boolean isReleaseAssociatedWithStage(String stageColor, Release currentRelease, Release release) {
+  public boolean isReleaseAssociatedWithStage(String stageColor, Release currentRelease, Release release) {
     return release.getNumber() != currentRelease.getNumber() && release.getManagedWorkload() != null
         && release.getManagedWorkload().getName().endsWith(stageColor);
   }
