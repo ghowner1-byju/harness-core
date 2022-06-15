@@ -101,9 +101,6 @@ public class NGKryoRegistrar implements KryoRegistrar {
     kryo.register(EnvironmentYaml.class, 8029);
     kryo.register(K8sRollingOutcome.class, 8034);
     kryo.register(K8sRollingRollbackOutcome.class, 8054);
-    // kryo.register(ServiceUseFromStage.class, 8036);
-    // kryo.register(ValuesManifest.class, 8037);
-    // kryo.register(ServiceUseFromStage.Overrides.class, 8038);
     kryo.register(InfraUseFromStage.class, 8039);
     kryo.register(InfraUseFromStage.Overrides.class, 8040);
     kryo.register(InfraStepParameters.class, 8042);
