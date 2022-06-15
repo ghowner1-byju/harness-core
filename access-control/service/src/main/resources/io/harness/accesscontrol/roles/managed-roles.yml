@@ -134,6 +134,7 @@ roles:
         - core_project_view
         - core_secret_view
         - core_connector_view
+        - core_smtp_view
         - core_delegate_view
         - core_delegateconfiguration_view
         - core_pipeline_view
@@ -190,6 +191,9 @@ roles:
         - core_connector_edit
         - core_connector_delete
         - core_connector_access
+        - core_smtp_view
+        - core_smtp_edit
+        - core_smtp_delete
         - core_delegate_view
         - core_delegate_edit
         - core_delegate_delete
@@ -305,6 +309,7 @@ roles:
         - core_organization_view
         - core_secret_view
         - core_connector_view
+        - core_smtp_view
         - core_delegate_view
         - core_delegateconfiguration_view
         - core_service_view
@@ -360,6 +365,9 @@ roles:
         - core_connector_edit
         - core_connector_delete
         - core_connector_access
+        - core_smtp_view
+        - core_smtp_edit
+        - core_smtp_delete
         - core_delegate_view
         - core_delegate_edit
         - core_delegate_delete
@@ -484,6 +492,7 @@ roles:
       permissions:
         - core_secret_view
         - core_connector_view
+        - core_smtp_view
         - core_delegate_view
         - core_delegateconfiguration_view
         - core_service_view
@@ -535,6 +544,7 @@ roles:
         - core_secret_access
         - core_connector_view
         - core_connector_access
+        - core_smtp_view
         - core_pipeline_view
         - core_pipeline_execute
         - core_service_view
