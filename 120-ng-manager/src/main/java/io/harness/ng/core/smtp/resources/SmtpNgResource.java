@@ -18,6 +18,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import io.harness.NGCommonEntityConstants;
 import io.harness.accesscontrol.AccountIdentifier;
 import io.harness.accesscontrol.acl.api.Resource;
+import io.harness.accesscontrol.acl.api.ResourceScope;
 import io.harness.accesscontrol.clients.AccessControlClient;
 import io.harness.annotations.dev.OwnedBy;
 import io.harness.connector.accesscontrol.ResourceTypes;
@@ -83,9 +84,10 @@ import lombok.extern.slf4j.Slf4j;
     })
 @OwnedBy(PL)
 public class SmtpNgResource {
-  @Inject private SmtpNgService smtpNgService;
+  private final SmtpNgService smtpNgService;
   private final AccessControlClient accessControlClient;
 
+  @Inject
   public SmtpNgResource(SmtpNgService smtpNgService, AccessControlClient accessControlClient) {
     this.smtpNgService = smtpNgService;
     this.accessControlClient = accessControlClient;
@@ -105,7 +107,8 @@ public class SmtpNgResource {
   save(@Valid @NotNull NgSmtpDTO variable,
       @Parameter(description = ACCOUNT_PARAM_MESSAGE, required = true) @NotNull @AccountIdentifier @QueryParam(
           NGCommonEntityConstants.ACCOUNT_KEY) String accountIdentifier) throws IOException {
-    accessControlClient.checkForAccessOrThrow(null, Resource.of(ResourceTypes.SMTP, null), EDIT_SMTP_PERMISSION);
+    accessControlClient.checkForAccessOrThrow(
+        ResourceScope.of(accountIdentifier, null, null), Resource.of(ResourceTypes.SMTP, null), EDIT_SMTP_PERMISSION);
     variable.setAccountId(accountIdentifier);
     NgSmtpDTO response = smtpNgService.saveSmtpSettings(variable);
     return ResponseDTO.newResponse(response);
@@ -144,7 +147,8 @@ public class SmtpNgResource {
   update(@Valid @NotNull NgSmtpDTO variable,
       @Parameter(description = ACCOUNT_PARAM_MESSAGE, required = true) @NotNull @AccountIdentifier @QueryParam(
           NGCommonEntityConstants.ACCOUNT_KEY) String accountIdentifier) throws IOException {
-    accessControlClient.checkForAccessOrThrow(null, Resource.of(ResourceTypes.SMTP, null), EDIT_SMTP_PERMISSION);
+    accessControlClient.checkForAccessOrThrow(
+        ResourceScope.of(accountIdentifier, null, null), Resource.of(ResourceTypes.SMTP, null), EDIT_SMTP_PERMISSION);
     variable.setAccountId(accountIdentifier);
     NgSmtpDTO response = smtpNgService.updateSmtpSettings(variable);
     return ResponseDTO.newResponse(response);
@@ -188,7 +192,8 @@ public class SmtpNgResource {
   delete(@Parameter(description = "Config identifier") @PathParam("identifier") String identifier,
       @Parameter(description = ACCOUNT_PARAM_MESSAGE, required = true) @NotNull @AccountIdentifier @QueryParam(
           NGCommonEntityConstants.ACCOUNT_KEY) String accountIdentifier) throws IOException {
-    accessControlClient.checkForAccessOrThrow(null, Resource.of(ResourceTypes.SMTP, null), DELETE_SMTP_PERMISSION);
+    accessControlClient.checkForAccessOrThrow(
+        ResourceScope.of(accountIdentifier, null, null), Resource.of(ResourceTypes.SMTP, null), DELETE_SMTP_PERMISSION);
     Boolean response = smtpNgService.deleteSmtpSettings(identifier);
     return ResponseDTO.newResponse(response);
   }
@@ -206,7 +211,8 @@ public class SmtpNgResource {
   @ExceptionMetered
   public ResponseDTO<NgSmtpDTO>
   get(@Parameter(description = ACCOUNT_PARAM_MESSAGE) @QueryParam("accountId") String accountId) throws IOException {
-    accessControlClient.checkForAccessOrThrow(null, Resource.of(ResourceTypes.SMTP, null), VIEW_SMTP_PERMISSION);
+    accessControlClient.checkForAccessOrThrow(
+        ResourceScope.of(accountId, null, null), Resource.of(ResourceTypes.SMTP, null), VIEW_SMTP_PERMISSION);
     NgSmtpDTO response = smtpNgService.getSmtpSettings(accountId);
     return ResponseDTO.newResponse(response);
   }
