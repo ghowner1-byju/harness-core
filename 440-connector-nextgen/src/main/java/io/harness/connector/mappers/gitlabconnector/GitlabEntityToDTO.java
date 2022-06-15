@@ -125,6 +125,7 @@ public class GitlabEntityToDTO implements ConnectorEntityToDTOMapper<GitlabConne
                 .tokenRef(SecretRefHelper.createSecretRef(gitlabOauth.getTokenRef()))
                 .refreshTokenRef(SecretRefHelper.createSecretRef(gitlabOauth.getRefreshTokenRef()))
                 .build();
+        break;
       default:
         Switch.unhandled(type);
     }
