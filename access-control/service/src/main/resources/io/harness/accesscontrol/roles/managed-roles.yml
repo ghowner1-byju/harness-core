@@ -1,6 +1,6 @@
 # Any edit in this file should accompany an increment in version.
 name: rolesConfiguration
-version: 26
+version: 27
 roles:
     - identifier: _project_admin
       name: Project Admin
@@ -18,6 +18,9 @@ roles:
         - core_connector_edit
         - core_connector_delete
         - core_connector_access
+        - core_smtp_view
+        - core_smtp_edit
+        - core_smtp_delete
         - core_delegate_view
         - core_delegate_edit
         - core_delegate_delete
