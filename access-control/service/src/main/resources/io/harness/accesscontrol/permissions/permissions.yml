@@ -858,39 +858,39 @@ permissions:
       - organization
       - project
   - identifier: sto_overview_page_view
-    name: View STO Module Overview Page
+    name: View Security Tests Overview Page
     status: ACTIVE
     includeInAllRoles: false
     allowedScopeLevels:
       - account
       - organization
       - project
-  - identifier: sto_test_target_view
-    name: View test targets
+  - identifier: sto_target_view
+    name: View targets
     status: ACTIVE
     includeInAllRoles: false
     allowedScopeLevels:
       - account
       - organization
       - project
-  - identifier: sto_test_target_create
-    name: Create test targets
+  - identifier: sto_target_create
+    name: Create targets
     status: ACTIVE
     includeInAllRoles: false
     allowedScopeLevels:
       - account
       - organization
       - project
-  - identifier: sto_test_target_edit
-    name: Edit test targets
+  - identifier: sto_target_edit
+    name: Edit targets
     status: ACTIVE
     includeInAllRoles: false
     allowedScopeLevels:
       - account
       - organization
       - project
-  - identifier: sto_test_target_delete
-    name: Delete test targets
+  - identifier: sto_target_delete
+    name: Delete targets
     status: ACTIVE
     includeInAllRoles: false
     allowedScopeLevels:
@@ -929,8 +929,8 @@ permissions:
       - account
       - organization
       - project
-  - identifier: sto_issue_create
-    name: Create security issue
+  - identifier: sto_issue_view
+    name: View security issue
     status: ACTIVE
     includeInAllRoles: false
     allowedScopeLevels:
@@ -945,8 +945,8 @@ permissions:
       - account
       - organization
       - project
-  - identifier: sto_scan_create
-    name: Create security scan
+  - identifier: sto_scan_view
+    name: View security scan
     status: ACTIVE
     includeInAllRoles: false
     allowedScopeLevels:

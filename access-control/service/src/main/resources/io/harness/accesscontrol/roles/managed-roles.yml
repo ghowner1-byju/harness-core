@@ -110,10 +110,10 @@ roles:
         - sto_issue_delete
         - sto_scan_view
         - sto_scan_delete
-        - sto_test_target_view
-        - sto_test_target_create
-        - sto_test_target_edit
-        - sto_test_target_delete
+        - sto_target_view
+        - sto_target_create
+        - sto_target_edit
+        - sto_target_delete
         - sto_exception_view
         - sto_exception_create
         - sto_exception_approve
@@ -175,7 +175,7 @@ roles:
         - sto_overview_page_view
         - sto_issue_view
         - sto_scan_view
-        - sto_test_target_view
+        - sto_target_view
         - sto_exception_view
         - core_file_view
         - core_variable_view
@@ -612,12 +612,12 @@ roles:
       name: Security Testing Developer Role
       description: Can work with security issues
       permissions:
-        - sto_overview_page_view
+        - sto_overview_view
         - sto_issue_view
         - sto_scan_view
-        - sto_test_target_view
-        - sto_test_target_create
-        - sto_test_target_edit
+        - sto_target_view
+        - sto_target_create
+        - sto_target_edit
         - sto_exception_view
         - sto_exception_create
     - identifier: _sto_secops_role
@@ -629,10 +629,10 @@ roles:
         - sto_issue_delete
         - sto_scan_view
         - sto_scan_delete
-        - sto_test_target_view
-        - sto_test_target_create
-        - sto_test_target_edit
-        - sto_test_target_delete
+        - sto_target_view
+        - sto_target_create
+        - sto_target_edit
+        - sto_target_delete
         - sto_exception_view
         - sto_exception_create
         - sto_exception_approve
