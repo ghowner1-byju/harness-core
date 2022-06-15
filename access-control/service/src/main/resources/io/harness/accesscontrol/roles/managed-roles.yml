@@ -620,6 +620,11 @@ roles:
         - sto_target_edit
         - sto_exception_view
         - sto_exception_create
+      managed: true
+      allowedScopeLevels:
+        - account
+        - organization
+        - project
     - identifier: _sto_secops_role
       name: Security Testing SecOps Role
       description: Can work with security issues and manage security exceptions
