@@ -16,6 +16,7 @@ import static io.harness.delegate.beans.VersionOverrideType.UPGRADER_IMAGE_TAG;
 import static io.harness.delegate.beans.VersionOverrideType.WATCHER_JAR;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import io.harness.delegate.beans.VersionOverride;
 import io.harness.delegate.beans.VersionOverride.VersionOverrideKeys;
@@ -87,6 +88,21 @@ public class DelegateVersionService {
       return ringVersion;
     }
 
+    return Collections.emptyList();
+  }
+
+  public List<String> getDelegateJarVersions(final String ringName, final String accountId) {
+    if (isNotEmpty(accountId)) {
+      final VersionOverride versionOverride = getVersionOverride(accountId, DELEGATE_JAR);
+      if (versionOverride != null && isNotBlank(versionOverride.getVersion())) {
+        return Collections.singletonList(versionOverride.getVersion());
+      }
+    }
+
+    final List<String> ringVersion = delegateRingService.getDelegateVersionsForRing(ringName);
+    if (!CollectionUtils.isEmpty(ringVersion)) {
+      return ringVersion;
+    }
     return Collections.emptyList();
   }
 
