@@ -64,7 +64,7 @@ public class NgSecretManagerFunctor implements ExpressionFunctor, NgSecretManage
   private final String orgId;
   private final String projectId;
   private final SecretManager secretManager;
-  private final Cache<String, Object> secretsCache;
+  private final Cache<String, EncryptedDataDetails> secretsCache;
   private final SecretManagerClientService ngSecretService;
   private SecretManagerMode mode;
 
@@ -122,27 +122,14 @@ public class NgSecretManagerFunctor implements ExpressionFunctor, NgSecretManage
                       .hashCode();
 
     List<EncryptedDataDetail> encryptedDataDetails = null;
-    boolean isCacheHit = false;
     if (secretsCache != null) {
-      Object cachedValue = secretsCache.get(String.valueOf(keyHash));
+      // Cache hit.
+      EncryptedDataDetails cachedValue = secretsCache.get(String.valueOf(keyHash));
       if (cachedValue != null) {
-        // Cache hit.
-        isCacheHit = true;
-        if (cachedValue instanceof EncryptedRecordData) {
-          EncryptedRecordData locallyEncryptedData = (EncryptedRecordData) cachedValue;
-          if (locallyEncryptedData != null) {
-            // Decrypt the value locally with previously saved encryption key.
-            if (locallyEncryptedData.getName().equals(secretIdentifier)) {
-              // Verify the name of secretIdentifier before returning cached value, there can be conflict in keyHash.
-              return new String(new SimpleEncryption(locallyEncryptedData.getEncryptionKey())
-                                    .decryptChars(locallyEncryptedData.getEncryptedValue()));
-            }
-          }
-        } else if (cachedValue instanceof Collection) {
-          encryptedDataDetails = (List) cachedValue;
-        }
+        encryptedDataDetails = cachedValue.getEncryptedDataDetailList();
       }
     }
+
     if (isEmpty(encryptedDataDetails)) {
       // Cache miss.
       encryptedDataDetails = ngSecretService.getEncryptionDetails(
@@ -152,7 +139,13 @@ public class NgSecretManagerFunctor implements ExpressionFunctor, NgSecretManage
       if (EmptyPredicate.isEmpty(encryptedDataDetails)) {
         throw new InvalidRequestException("No secret found with identifier + [" + secretIdentifier + "]", USER);
       }
+      EncryptedDataDetails objectToCache =
+          EncryptedDataDetails.builder()
+          .encryptedDataDetailList(encryptedDataDetails)
+          .build();
+      secretsCache.put(String.valueOf(keyHash), objectToCache);
     }
+
     List<EncryptedDataDetail> localEncryptedDetails =
         encryptedDataDetails.stream()
             .filter(encryptedDataDetail
@@ -163,24 +156,8 @@ public class NgSecretManagerFunctor implements ExpressionFunctor, NgSecretManage
       // ToDo Vikas said that we can have decrypt here for now. Later on it will be moved to proper service.
       decryptLocal(secretVariableDTO, localEncryptedDetails);
       final String secretValue = new String(secretVariableDTO.getSecret().getDecryptedValue());
-      final String localEncryptionKey = generateUuid();
-
-      char[] reEncryptedValue =
-          new SimpleEncryption(localEncryptionKey).encryptChars(secretVariableDTO.getSecret().getDecryptedValue());
-      EncryptedRecordData locallyEncryptedData =
-          EncryptedRecordData.builder()
-              .uuid(localEncryptedDetails.get(0).getEncryptedData().getUuid())
-              .name(secretVariableDTO.getName())
-              .encryptionType(LOCAL)
-              .encryptionKey(localEncryptionKey)
-              .encryptedValue(reEncryptedValue)
-              .base64Encoded(localEncryptedDetails.get(0).getEncryptedData().isBase64Encoded())
-              .build();
-      secretsCache.put(String.valueOf(keyHash), locallyEncryptedData);
       evaluatedSecrets.put(secretIdentifier, secretValue);
       return returnValue(secretIdentifier, secretValue);
-    } else if (!isCacheHit) {
-      secretsCache.put(String.valueOf(keyHash), encryptedDataDetails);
     }
 
     List<EncryptedDataDetail> nonLocalEncryptedDetails =

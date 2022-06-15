@@ -18,6 +18,7 @@ import io.harness.version.VersionInfoManager;
 import software.wings.beans.ApiKeyEntry;
 import software.wings.beans.AuthToken;
 import software.wings.beans.security.access.WhitelistConfig;
+import software.wings.expression.EncryptedDataDetails;
 import software.wings.security.UserPermissionInfo;
 import software.wings.security.UserRestrictionInfo;
 import software.wings.service.impl.newrelic.NewRelicApplication.NewRelicApplications;
@@ -122,9 +123,9 @@ public class ManagerCacheRegistrar extends AbstractModule {
   @Provides
   @Named(SECRET_TOKEN_CACHE)
   @Singleton
-  public Cache<String, Object> getSecretTokenCache(
+  public Cache<String, EncryptedDataDetails> getSecretTokenCache(
       HarnessCacheManager harnessCacheManager, VersionInfoManager versionInfoManager) {
-    return harnessCacheManager.getCache(SECRET_TOKEN_CACHE, String.class, Object.class,
+    return harnessCacheManager.getCache(SECRET_TOKEN_CACHE, String.class, EncryptedDataDetails.class,
         CreatedExpiryPolicy.factoryOf(TWENTY_MINUTES), versionInfoManager.getVersionInfo().getBuildNo());
   }
 
@@ -154,7 +155,7 @@ public class ManagerCacheRegistrar extends AbstractModule {
     }, Names.named(APIKEY_RESTRICTION_CACHE)));
     mapBinder.addBinding(WHITELIST_CACHE).to(Key.get(new TypeLiteral<Cache<String, WhitelistConfig>>() {
     }, Names.named(WHITELIST_CACHE)));
-    mapBinder.addBinding(SECRET_TOKEN_CACHE).to(Key.get(new TypeLiteral<Cache<String, Object>>() {
+    mapBinder.addBinding(SECRET_TOKEN_CACHE).to(Key.get(new TypeLiteral<Cache<String, EncryptedDataDetails>>() {
     }, Names.named(SECRET_TOKEN_CACHE)));
   }
 
