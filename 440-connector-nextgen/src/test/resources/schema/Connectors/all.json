@@ -3608,7 +3608,7 @@
           "then": {
             "properties": {
               "spec": {
-                "$ref": "#/definitions/GitlabOAuth"
+                "$ref": "#/definitions/GitlabOauth"
               }
             }
           }
@@ -3761,22 +3761,6 @@
           "if": {
             "properties": {
               "type": {
-                "const": "OAuth"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "spec": {
-                "$ref": "#/definitions/GitlabOAuth"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "type": {
                 "const": "Kerberos"
               }
             }
@@ -3785,6 +3769,22 @@
             "properties": {
               "spec": {
                 "$ref": "#/definitions/GitlabKerberos"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "OAuth"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "spec": {
+                "$ref": "#/definitions/GitlabOauth"
               }
             }
           }
@@ -3828,29 +3828,6 @@
       "type": "object",
       "$schema": "http://json-schema.org/draft-07/schema#"
     },
-    "GitlabOauth": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/GitlabOauthDTO"
-        },
-        {
-          "type": "object",
-          "required": [
-            "tokenRef",
-            "refreshTokenRef"
-          ],
-          "properties": {
-            "tokenRef": {
-              "type": "string"
-            },
-            "refreshTokenRef": {
-              "type": "string"
-            }
-          }
-        }
-      ],
-      "$schema": "http://json-schema.org/draft-07/schema#"
-    },
     "GitlabKerberos": {
       "allOf": [
         {
@@ -3863,6 +3840,29 @@
           ],
           "properties": {
             "kerberosKeyRef": {
+              "type": "string"
+            }
+          }
+        }
+      ],
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "GitlabOauth": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/GitlabHttpCredentialsSpecDTO"
+        },
+        {
+          "type": "object",
+          "required": [
+            "refreshTokenRef",
+            "tokenRef"
+          ],
+          "properties": {
+            "refreshTokenRef": {
+              "type": "string"
+            },
+            "tokenRef": {
               "type": "string"
             }
           }
