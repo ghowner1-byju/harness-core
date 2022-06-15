@@ -17,7 +17,6 @@ import io.harness.redis.RedisConfig;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,12 +33,9 @@ public class DebeziumControllerStarter {
     for (String monitoredCollection : collections) {
       try {
         MongoCollectionChangeConsumer changeConsumer = consumerFactory.get(monitoredCollection, changeConsumerConfig);
-        Properties props = DebeziumConfiguration.getDebeziumProperties(debeziumConfig, redisLockConfig);
-        props.setProperty(DebeziumConfiguration.OFFSET_STORAGE_KEY,
-            debeziumConfig.getOffsetStorageTopic() + "-" + monitoredCollection);
-        props.setProperty(DebeziumConfiguration.COLLECTION_INCLUDE_LIST, monitoredCollection);
-        DebeziumController debeziumController =
-            new DebeziumController(props, changeConsumer, locker, debeziumExecutorService);
+        DebeziumController debeziumController = new DebeziumController(
+            DebeziumConfiguration.getDebeziumProperties(debeziumConfig, redisLockConfig, monitoredCollection),
+            changeConsumer, locker, debeziumExecutorService);
         debeziumExecutorService.submit(debeziumController);
       } catch (Exception e) {
         log.error("Cannot Start Debezium Controller for Collection {}", monitoredCollection, e);

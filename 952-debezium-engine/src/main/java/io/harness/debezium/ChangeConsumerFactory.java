@@ -18,6 +18,7 @@ public class ChangeConsumerFactory {
   public <T extends MongoCollectionChangeConsumer> T get(
       String collectionName, ChangeConsumerConfig changeConsumerConfig) {
     ConsumerType consumerType = changeConsumerConfig.getConsumerType();
+
     switch (consumerType) {
       case EVENTS_FRAMEWORK:
         return (T) new EventsFrameworkChangeConsumer(collectionName, producerFactory);
