@@ -8,7 +8,8 @@
 package io.harness.delegate.k8s;
 
 import static io.harness.annotations.dev.HarnessTeam.CDP;
-import static io.harness.delegate.k8s.K8sRollingRollbackBaseHandler.ResourceRecreationStatus.*;
+import static io.harness.delegate.k8s.K8sRollingRollbackBaseHandler.ResourceRecreationStatus.NO_RESOURCE_CREATED;
+import static io.harness.delegate.k8s.K8sRollingRollbackBaseHandler.ResourceRecreationStatus.RESOURCE_CREATION_FAILED;
 import static io.harness.exception.ExceptionUtils.getMessage;
 import static io.harness.k8s.K8sCommandUnitConstants.DeleteFailedReleaseResources;
 import static io.harness.k8s.K8sCommandUnitConstants.Init;

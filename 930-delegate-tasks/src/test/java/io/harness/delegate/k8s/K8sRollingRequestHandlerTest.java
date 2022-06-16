@@ -44,7 +44,6 @@ import io.harness.delegate.task.k8s.K8sRollingDeployRequest;
 import io.harness.delegate.task.k8s.K8sRollingDeployResponse;
 import io.harness.delegate.task.k8s.K8sTaskHelperBase;
 import io.harness.delegate.task.k8s.KustomizeManifestDelegateConfig;
-import io.harness.delegate.task.k8s.ManifestDelegateConfig;
 import io.harness.exception.InvalidRequestException;
 import io.harness.k8s.KubernetesContainerService;
 import io.harness.k8s.kubectl.Kubectl;
@@ -59,6 +58,7 @@ import io.harness.rule.Owner;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.joor.Reflect;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -170,6 +170,8 @@ public class K8sRollingRequestHandlerTest extends CategoryTest {
             .releaseName("releaseName")
             .pruningEnabled(true)
             .manifestDelegateConfig(K8sManifestDelegateConfig.builder().build())
+            .k8sInfraDelegateConfig(mock(K8sInfraDelegateConfig.class))
+
             .build();
     List<KubernetesResourceId> prunedResourceIds = singletonList(KubernetesResourceId.builder().build());
     doReturn(prunedResourceIds).when(rollingRequestHandler).prune(any(), any(), any());

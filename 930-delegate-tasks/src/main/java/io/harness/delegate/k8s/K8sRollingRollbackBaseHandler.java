@@ -551,7 +551,7 @@ public class K8sRollingRollbackBaseHandler {
   @NotNull
   public Set<KubernetesResourceId> getResourcesRecreated(
       List<KubernetesResourceId> prunedResourceIds, ResourceRecreationStatus resourceRecreationStatus) {
-    return resourceRecreationStatus.equals(ResourceRecreationStatus.RESOURCE_CREATION_SUCCESSFUL)
+    return resourceRecreationStatus == ResourceRecreationStatus.RESOURCE_CREATION_SUCCESSFUL
         ? new HashSet<>(prunedResourceIds)
         : Collections.emptySet();
   }

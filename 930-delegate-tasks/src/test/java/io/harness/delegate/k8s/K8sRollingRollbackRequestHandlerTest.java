@@ -181,6 +181,7 @@ public class K8sRollingRollbackRequestHandlerTest extends CategoryTest {
   public void testPruningWithRecreationFailed() throws Exception {
     K8sRollingRollbackDeployRequest deployRequest = K8sRollingRollbackDeployRequest.builder()
                                                         .timeoutIntervalInMin(timeoutIntervalInMin)
+                                                        .releaseNumber(1)
                                                         .pruningEnabled(true)
                                                         .build();
     doThrow(new KubernetesTaskException("error"))
@@ -204,6 +205,7 @@ public class K8sRollingRollbackRequestHandlerTest extends CategoryTest {
                                                         .timeoutIntervalInMin(timeoutIntervalInMin)
                                                         .pruningEnabled(true)
                                                         .prunedResourceIds(prunedResourceIds)
+                                                        .releaseNumber(1)
                                                         .build();
     doReturn(RESOURCE_CREATION_SUCCESSFUL)
         .when(k8sRollingRollbackBaseHandler)
