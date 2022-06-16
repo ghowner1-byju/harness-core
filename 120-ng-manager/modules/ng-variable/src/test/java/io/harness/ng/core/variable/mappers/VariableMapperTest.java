@@ -5,7 +5,7 @@
  * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
  */
 
-package io.harness.ng.core.vairable.mappers;
+package io.harness.ng.core.variable.mappers;
 
 import static io.harness.rule.OwnerRule.NISHANT;
 
@@ -20,7 +20,6 @@ import io.harness.ng.core.variable.dto.StringVariableConfigDTO;
 import io.harness.ng.core.variable.dto.VariableDTO;
 import io.harness.ng.core.variable.entity.StringVariable;
 import io.harness.ng.core.variable.entity.Variable;
-import io.harness.ng.core.variable.mappers.VariableMapper;
 import io.harness.rule.Owner;
 
 import org.junit.Before;

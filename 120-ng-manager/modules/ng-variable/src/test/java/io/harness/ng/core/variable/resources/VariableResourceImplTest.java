@@ -46,7 +46,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class VariableResourceTest extends CategoryTest {
+public class VariableResourceImplTest extends CategoryTest {
   @Mock private VariableService variableService;
   @Mock private VariableMapper variableMapper;
   @Mock private AccessControlClient accessControlClient;
@@ -61,7 +61,7 @@ public class VariableResourceTest extends CategoryTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    variableResource = new VariableResource(variableService, variableMapper, accessControlClient);
+    variableResource = new VariableResourceImpl(variableService, variableMapper, accessControlClient);
   }
 
   @Test
