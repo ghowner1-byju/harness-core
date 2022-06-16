@@ -41,7 +41,7 @@ import org.apache.commons.codec.binary.Hex;
 @Slf4j
 @Singleton
 public class TokenGenerator {
-  private static final TemporalAmount EXP_DURATION = Duration.ofHours(10);
+  private static final TemporalAmount EXP_DURATION = Duration.ofMinutes(30);
   private long expiryTimeOfLastJWT;
   private String lastEncryptedJWT;
 
@@ -66,7 +66,6 @@ public class TokenGenerator {
     try {
       readWriteLock.readLock().lock();
       if (lastEncryptedJWT != null && expiryTimeOfLastJWT > System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5)) {
-        log.info("Vishal: Sending old jwt {}", lastEncryptedJWT);
         return lastEncryptedJWT;
       }
     } finally {
@@ -97,7 +96,6 @@ public class TokenGenerator {
 
       expiryTimeOfLastJWT = jwtClaims.getExpirationTime().getTime();
       lastEncryptedJWT = jwt.serialize();
-      log.info("Vishal: Sending new jwt {}", lastEncryptedJWT);
       return lastEncryptedJWT;
     } finally {
       readWriteLock.writeLock().unlock();
