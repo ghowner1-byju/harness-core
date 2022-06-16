@@ -16,6 +16,7 @@ import io.harness.plancreator.steps.TaskSelectorYaml;
 import io.harness.pms.yaml.ParameterField;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -43,5 +44,17 @@ public class K8sRollingRollbackStepParameters extends K8sRollingRollbackBaseStep
     return Arrays.asList(K8sCommandUnitConstants.Init, K8sCommandUnitConstants.RecreatePrunedResource,
         K8sCommandUnitConstants.DeleteFailedReleaseResources, K8sCommandUnitConstants.Rollback,
         K8sCommandUnitConstants.WaitForSteadyState);
+  }
+
+  @Nonnull
+  @Override
+  @JsonIgnore
+  public List<String> getCommandUnits(boolean isPruningEnabled) {
+    if (isPruningEnabled) {
+      return Arrays.asList(K8sCommandUnitConstants.Init, K8sCommandUnitConstants.RecreatePrunedResource,
+          K8sCommandUnitConstants.DeleteFailedReleaseResources, K8sCommandUnitConstants.Rollback,
+          K8sCommandUnitConstants.WaitForSteadyState);
+    }
+    return getCommandUnits();
   }
 }

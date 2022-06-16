@@ -38,8 +38,19 @@ public class K8sBlueGreenStepParameters extends K8sBlueGreenBaseStepInfo impleme
   @NotNull
   @Override
   public List<String> getCommandUnits() {
-    return new ArrayList<>(Arrays.asList(K8sCommandUnitConstants.FetchFiles, K8sCommandUnitConstants.Init,
-        K8sCommandUnitConstants.Prepare, K8sCommandUnitConstants.Apply, K8sCommandUnitConstants.WaitForSteadyState,
-        K8sCommandUnitConstants.WrapUp, K8sCommandUnitConstants.Prune));
+    return new ArrayList<>(
+        Arrays.asList(K8sCommandUnitConstants.FetchFiles, K8sCommandUnitConstants.Init, K8sCommandUnitConstants.Prepare,
+            K8sCommandUnitConstants.Apply, K8sCommandUnitConstants.WaitForSteadyState, K8sCommandUnitConstants.WrapUp));
+  }
+
+  @NotNull
+  @Override
+  public List<String> getCommandUnits(boolean isPruningEnabled) {
+    if (isPruningEnabled) {
+      return new ArrayList<>(Arrays.asList(K8sCommandUnitConstants.FetchFiles, K8sCommandUnitConstants.Init,
+          K8sCommandUnitConstants.Prepare, K8sCommandUnitConstants.Apply, K8sCommandUnitConstants.WaitForSteadyState,
+          K8sCommandUnitConstants.WrapUp, K8sCommandUnitConstants.Prune));
+    }
+    return getCommandUnits();
   }
 }
