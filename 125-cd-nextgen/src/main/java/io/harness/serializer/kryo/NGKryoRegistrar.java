@@ -55,7 +55,6 @@ import io.harness.cdng.k8s.beans.HelmValuesFetchResponsePassThroughData;
 import io.harness.cdng.k8s.beans.K8sExecutionPassThroughData;
 import io.harness.cdng.k8s.beans.StepExceptionPassThroughData;
 import io.harness.cdng.manifest.steps.ManifestStepParameters;
-import io.harness.cdng.manifest.yaml.kinds.ValuesManifest;
 import io.harness.cdng.pipeline.PipelineInfrastructure;
 import io.harness.cdng.pipeline.beans.DeploymentStageStepParameters;
 import io.harness.cdng.pipeline.beans.RollbackNode;
@@ -76,7 +75,6 @@ import io.harness.cdng.serverless.ServerlessStepPassThroughData;
 import io.harness.cdng.serverless.beans.ServerlessExecutionPassThroughData;
 import io.harness.cdng.serverless.beans.ServerlessGitFetchFailurePassThroughData;
 import io.harness.cdng.serverless.beans.ServerlessStepExceptionPassThroughData;
-import io.harness.cdng.service.beans.ServiceUseFromStage;
 import io.harness.cdng.service.steps.ServiceStepParameters;
 import io.harness.cdng.ssh.CommandStepInfo;
 import io.harness.cdng.tasks.manifestFetch.step.ManifestFetchOutcome;
@@ -101,6 +99,7 @@ public class NGKryoRegistrar implements KryoRegistrar {
     kryo.register(EnvironmentYaml.class, 8029);
     kryo.register(K8sRollingOutcome.class, 8034);
     kryo.register(K8sRollingRollbackOutcome.class, 8054);
+
     kryo.register(InfraUseFromStage.class, 8039);
     kryo.register(InfraUseFromStage.Overrides.class, 8040);
     kryo.register(InfraStepParameters.class, 8042);
