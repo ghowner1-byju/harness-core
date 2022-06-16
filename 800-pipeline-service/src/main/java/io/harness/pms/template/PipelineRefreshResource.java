@@ -151,7 +151,7 @@ public class PipelineRefreshResource {
       @QueryParam(NGCommonEntityConstants.IDENTIFIER_KEY) String pipelineIdentifier,
       @BeanParam GitEntityFindInfoDTO gitEntityBasicInfo) {
     accessControlClient.checkForAccessOrThrow(ResourceScope.of(accountId, orgId, projectId),
-        Resource.of("PIPELINE", pipelineIdentifier), PipelineRbacPermissions.PIPELINE_EXECUTE);
+        Resource.of("PIPELINE", pipelineIdentifier), PipelineRbacPermissions.PIPELINE_CREATE_AND_EDIT);
     return ResponseDTO.newResponse(pipelineRefreshService.recursivelyRefreshAllTemplateInputsInPipeline(
         accountId, orgId, projectId, pipelineIdentifier));
   }
