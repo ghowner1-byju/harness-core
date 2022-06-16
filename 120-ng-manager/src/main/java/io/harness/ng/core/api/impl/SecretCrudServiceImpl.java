@@ -151,6 +151,7 @@ public class SecretCrudServiceImpl implements SecretCrudService {
    boolean isHarnessManaged = checkIfSecretManagerUsedIsHarnessManaged(accountIdentifier, dto);
     GovernanceMetadata governanceMetadata = null;
     SecretResponseWrapper secretResponseWrapper = SecretResponseWrapper.builder().build();
+
     if(!isHarnessManaged){
       governanceMetadata = opaSecretService.evaluatePoliciesWithEntity(accountIdentifier,dto, dto.getOrgIdentifier(), dto.getProjectIdentifier(),OpaConstants.OPA_EVALUATION_ACTION_CONNECTOR_SAVE,dto.getIdentifier());
       secretResponseWrapper.setGovernanceMetadata(governanceMetadata);
