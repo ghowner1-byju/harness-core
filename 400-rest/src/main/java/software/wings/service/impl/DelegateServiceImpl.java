@@ -4059,7 +4059,9 @@ public class DelegateServiceImpl implements DelegateService {
 
     Query<Delegate> delegateQuery = persistence.createQuery(Delegate.class)
                                         .filter(DelegateKeys.accountId, accountId)
-                                        .filter(DelegateKeys.delegateName, delegateName);
+                                        .filter(DelegateKeys.delegateName, delegateName)
+                                        .field(DelegateKeys.status)
+                                        .notEqual(DelegateInstanceStatus.DELETED);
     if (delegateQuery.get() != null) {
       throw new InvalidRequestException(
           "Delegate with same name exists. Delegate name must be unique across account.", USER);
