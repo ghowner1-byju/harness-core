@@ -535,8 +535,8 @@ public class PipelineResource implements YamlSchemaResource {
           content =
           {
             @Content(mediaType = "application/json",
-                examples = @ExampleObject(name = "List", summary = "Sample List Pipeline JSON Input",
-                    value = PipelineAPIConstants.LIST_PIPELINE_API, description = "Sample List JSON"))
+                examples = @ExampleObject(name = "List", summary = "Sample List Pipeline JSON",
+                    value = PipelineAPIConstants.LIST_PIPELINE_API, description = "Sample List Pipeline JSON Payload"))
           }) PipelineFilterPropertiesDto filterProperties,
       @Parameter(description = "Boolean flag to get distinct pipelines from all branches.") @QueryParam(
           "getDistinctFromBranches") Boolean getDistinctFromBranches) {
