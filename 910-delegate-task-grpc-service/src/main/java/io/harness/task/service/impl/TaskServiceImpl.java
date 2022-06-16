@@ -8,13 +8,8 @@
 package io.harness.task.service.impl;
 
 import static io.harness.annotations.dev.HarnessTeam.CI;
-import static io.harness.govern.Switch.unhandled;
-
-import static java.lang.String.format;
 
 import io.harness.annotations.dev.OwnedBy;
-import io.harness.delegate.TaskExecutionStage;
-import io.harness.delegate.TaskId;
 import io.harness.delegate.task.stepstatus.StepStatusTaskResponseData;
 import io.harness.delegate.task.stepstatus.artifact.ArtifactMetadata;
 import io.harness.delegate.task.stepstatus.artifact.ArtifactMetadataType;
@@ -22,30 +17,18 @@ import io.harness.delegate.task.stepstatus.artifact.DockerArtifactDescriptor;
 import io.harness.delegate.task.stepstatus.artifact.DockerArtifactMetadata;
 import io.harness.delegate.task.stepstatus.artifact.FileArtifactDescriptor;
 import io.harness.delegate.task.stepstatus.artifact.FileArtifactMetadata;
-import io.harness.exception.InvalidArgumentsException;
 import io.harness.grpc.DelegateServiceGrpcAgentClient;
 import io.harness.serializer.KryoSerializer;
 import io.harness.task.converters.ResponseDataConverterRegistry;
-import io.harness.task.service.ExecuteParkedTaskRequest;
-import io.harness.task.service.ExecuteParkedTaskResponse;
-import io.harness.task.service.FetchParkedTaskStatusRequest;
-import io.harness.task.service.FetchParkedTaskStatusResponse;
-import io.harness.task.service.HTTPTaskResponse;
-import io.harness.task.service.JiraTaskResponse;
 import io.harness.task.service.SendTaskProgressRequest;
 import io.harness.task.service.SendTaskProgressResponse;
 import io.harness.task.service.SendTaskStatusRequest;
 import io.harness.task.service.SendTaskStatusResponse;
-import io.harness.task.service.TaskProgressRequest;
-import io.harness.task.service.TaskProgressResponse;
 import io.harness.task.service.TaskServiceGrpc;
 import io.harness.task.service.TaskStatusData;
-import io.harness.task.service.TaskType;
-import io.harness.tasks.ResponseData;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
-import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import java.time.Duration;
 import java.util.List;
@@ -66,7 +49,6 @@ public class TaskServiceImpl extends TaskServiceGrpc.TaskServiceImplBase {
     this.kryoSerializer = kryoSerializer;
     this.responseDataConverterRegistry = responseDataConverterRegistry;
   }
-
 
   @Override
   public void sendTaskStatus(SendTaskStatusRequest request, StreamObserver<SendTaskStatusResponse> responseObserver) {

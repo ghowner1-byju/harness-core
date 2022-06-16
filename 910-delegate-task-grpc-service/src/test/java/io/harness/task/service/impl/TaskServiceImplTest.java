@@ -22,7 +22,6 @@ import io.harness.annotations.dev.OwnedBy;
 import io.harness.callback.DelegateCallbackToken;
 import io.harness.category.element.UnitTests;
 import io.harness.delegate.AccountId;
-import io.harness.delegate.TaskExecutionStage;
 import io.harness.delegate.TaskId;
 import io.harness.delegate.task.stepstatus.artifact.ArtifactMetadata;
 import io.harness.delegate.task.stepstatus.artifact.DockerArtifactDescriptor;
@@ -35,8 +34,6 @@ import io.harness.serializer.KryoSerializer;
 import io.harness.task.TaskServiceTestBase;
 import io.harness.task.TaskServiceTestHelper;
 import io.harness.task.converters.ResponseDataConverterRegistry;
-import io.harness.task.service.ExecuteParkedTaskRequest;
-import io.harness.task.service.ExecuteParkedTaskResponse;
 import io.harness.task.service.FetchParkedTaskStatusRequest;
 import io.harness.task.service.FetchParkedTaskStatusResponse;
 import io.harness.task.service.SendTaskProgressRequest;
@@ -44,14 +41,11 @@ import io.harness.task.service.SendTaskProgressResponse;
 import io.harness.task.service.SendTaskStatusRequest;
 import io.harness.task.service.SendTaskStatusResponse;
 import io.harness.task.service.StepStatus;
-import io.harness.task.service.TaskProgressRequest;
-import io.harness.task.service.TaskProgressResponse;
 import io.harness.task.service.TaskServiceGrpc;
 import io.harness.task.service.TaskStatusData;
 import io.harness.task.service.TaskType;
 
 import com.google.inject.Inject;
-import com.google.protobuf.ByteString;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
@@ -99,119 +93,6 @@ public class TaskServiceImplTest extends TaskServiceTestBase {
   @After
   public void doCleanup() {
     testInProcessServer.shutdown();
-  }
-
-  @Test
-  @Owner(developers = ALEKSANDAR)
-  @Category(UnitTests.class)
-  public void shouldExecuteParkedTask() {
-    when(delegateServiceGrpcAgentClient.executeParkedTask(eq(accountId), eq(taskId)))
-        .thenReturn(io.harness.delegate.ExecuteParkedTaskResponse.newBuilder().setTaskId(taskId).build())
-        .thenThrow(new IllegalArgumentException());
-    ExecuteParkedTaskResponse executeParkedTaskResponse = taskServiceBlockingStub.executeParkedTask(
-        ExecuteParkedTaskRequest.newBuilder().setAccountId(accountId).setTaskId(taskId).build());
-    assertThat(executeParkedTaskResponse).isEqualTo(ExecuteParkedTaskResponse.newBuilder().setTaskId(taskId).build());
-
-    assertThatThrownBy(()
-                           -> taskServiceBlockingStub.executeParkedTask(
-                               ExecuteParkedTaskRequest.newBuilder().setAccountId(accountId).setTaskId(taskId).build()))
-        .isInstanceOf(io.grpc.StatusRuntimeException.class);
-  }
-
-  @Test
-  @Owner(developers = ALEKSANDAR)
-  @Category(UnitTests.class)
-  public void shouldGetTaskProgress() {
-    when(delegateServiceGrpcAgentClient.taskProgress(eq(accountId), eq(taskId)))
-        .thenReturn(TaskExecutionStage.EXECUTING)
-        .thenThrow(new IllegalArgumentException());
-    TaskProgressResponse taskProgressResponse = taskServiceBlockingStub.taskProgress(
-        TaskProgressRequest.newBuilder().setAccountId(accountId).setTaskId(taskId).build());
-    assertThat(taskProgressResponse)
-        .isEqualTo(TaskProgressResponse.newBuilder().setCurrentStage(TaskExecutionStage.EXECUTING).build());
-
-    assertThatThrownBy(()
-                           -> taskServiceBlockingStub.taskProgress(
-                               TaskProgressRequest.newBuilder().setAccountId(accountId).setTaskId(taskId).build()))
-        .isInstanceOf(io.grpc.StatusRuntimeException.class);
-  }
-
-  @Test
-  @Owner(developers = ALEKSANDAR)
-  @Category(UnitTests.class)
-  public void shouldGetHTTPTaskResults() {
-    when(delegateServiceGrpcAgentClient.fetchParkedTaskStatus(accountId, taskId, delegateCallbackToken))
-        .thenReturn(
-            io.harness.delegate.FetchParkedTaskStatusResponse.newBuilder()
-                .setFetchResults(true)
-                .setSerializedTaskResults(ByteString.copyFrom(taskServiceTestHelper.getDeflatedHttpResponseData()))
-                .build())
-        .thenThrow(new IllegalArgumentException());
-    FetchParkedTaskStatusResponse taskResults =
-        taskServiceBlockingStub.fetchParkedTaskStatus(FetchParkedTaskStatusRequest.newBuilder()
-                                                          .setAccountId(accountId)
-                                                          .setTaskId(taskId)
-                                                          .setCallbackToken(delegateCallbackToken)
-                                                          .setTaskType(TaskType.HTTP)
-                                                          .build());
-
-    assertThat(taskResults)
-        .isEqualTo(
-            FetchParkedTaskStatusResponse.newBuilder()
-                .setTaskId(taskId)
-                .setTaskType(TaskType.HTTP)
-                .setHaveResponseData(true)
-                .setHttpTaskResponse(taskServiceTestHelper.getHttpTaskResponse())
-                .setSerializedTaskResults(ByteString.copyFrom(taskServiceTestHelper.getDeflatedHttpResponseData()))
-                .build());
-
-    assertThatThrownBy(()
-                           -> taskServiceBlockingStub.fetchParkedTaskStatus(FetchParkedTaskStatusRequest.newBuilder()
-                                                                                .setAccountId(accountId)
-                                                                                .setTaskId(taskId)
-                                                                                .setCallbackToken(delegateCallbackToken)
-                                                                                .setTaskType(TaskType.HTTP)
-                                                                                .build()))
-        .isInstanceOf(io.grpc.StatusRuntimeException.class);
-  }
-
-  @Test
-  @Owner(developers = ALEKSANDAR)
-  @Category(UnitTests.class)
-  public void shouldGetJIRATaskResults() {
-    when(delegateServiceGrpcAgentClient.fetchParkedTaskStatus(accountId, taskId, delegateCallbackToken))
-        .thenReturn(
-            io.harness.delegate.FetchParkedTaskStatusResponse.newBuilder()
-                .setFetchResults(true)
-                .setSerializedTaskResults(ByteString.copyFrom(taskServiceTestHelper.getDeflatedJiraResponseData()))
-                .build())
-        .thenThrow(new IllegalArgumentException());
-    FetchParkedTaskStatusResponse taskResults =
-        taskServiceBlockingStub.fetchParkedTaskStatus(FetchParkedTaskStatusRequest.newBuilder()
-                                                          .setAccountId(accountId)
-                                                          .setTaskId(taskId)
-                                                          .setCallbackToken(delegateCallbackToken)
-                                                          .setTaskType(TaskType.JIRA)
-                                                          .build());
-
-    assertThat(taskResults)
-        .isEqualTo(
-            FetchParkedTaskStatusResponse.newBuilder()
-                .setTaskId(taskId)
-                .setTaskType(TaskType.JIRA)
-                .setHaveResponseData(true)
-                .setJiraTaskResponse(taskServiceTestHelper.getJiraTaskResponse())
-                .setSerializedTaskResults(ByteString.copyFrom(taskServiceTestHelper.getDeflatedJiraResponseData()))
-                .build());
-
-    assertThatThrownBy(()
-                           -> taskServiceBlockingStub.fetchParkedTaskStatus(FetchParkedTaskStatusRequest.newBuilder()
-                                                                                .setAccountId(accountId)
-                                                                                .setTaskId(taskId)
-                                                                                .setCallbackToken(delegateCallbackToken)
-                                                                                .setTaskType(TaskType.JIRA)
-                                                                                .build()))
-        .isInstanceOf(io.grpc.StatusRuntimeException.class);
   }
 
   @Test
