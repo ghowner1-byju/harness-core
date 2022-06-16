@@ -7,6 +7,7 @@
 
 package software.wings.service.impl.aws.manager;
 
+import io.harness.CategoryTest;
 import io.harness.category.element.UnitTests;
 import io.harness.rule.Owner;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mock;
 import software.wings.beans.AmazonClientSDKDefaultBackoffStrategy;
 import software.wings.beans.AwsConfig;
+import software.wings.sm.ExecutionContextImpl;
 
 import static io.harness.rule.OwnerRule.IVAN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,12 +26,9 @@ import static software.wings.service.impl.aws.model.AwsConstants.MAX_ERROR_RETRY
 import static software.wings.service.impl.aws.model.AwsConstants.THROTTLED_BASE_DELAY_ACCOUNT_VARIABLE;
 
 
-import software.wings.sm.ExecutionContextImpl;
-
-
-
-public class AwsHelperServiceManagerTest {
-    @Mock private ExecutionContextImpl executionContext;
+public class AwsHelperServiceManagerTest extends CategoryTest {
+    @Mock
+    private ExecutionContextImpl executionContext;
 
     @Test
     @Owner(developers = IVAN)
