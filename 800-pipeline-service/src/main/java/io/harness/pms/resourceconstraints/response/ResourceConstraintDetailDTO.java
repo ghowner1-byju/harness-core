@@ -24,6 +24,7 @@ import lombok.Value;
 @ApiModel("ResourceConstraintDetail")
 @OwnedBy(HarnessTeam.PIPELINE)
 public class ResourceConstraintDetailDTO {
+  String pipelineName;
   String pipelineIdentifier;
   String planExecutionId;
   State state;

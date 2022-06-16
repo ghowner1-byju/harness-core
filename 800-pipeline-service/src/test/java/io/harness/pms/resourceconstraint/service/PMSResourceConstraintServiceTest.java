@@ -11,6 +11,7 @@ import static io.harness.data.structure.UUIDGenerator.generateUuid;
 import static io.harness.distribution.constraint.Consumer.State.ACTIVE;
 import static io.harness.distribution.constraint.Consumer.State.BLOCKED;
 import static io.harness.rule.OwnerRule.ALEXEI;
+import static io.harness.rule.OwnerRule.FERNANDOD;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,6 +30,8 @@ import io.harness.engine.executions.plan.PlanExecutionService;
 import io.harness.exception.InvalidRequestException;
 import io.harness.execution.PlanExecution;
 import io.harness.pms.contracts.plan.ExecutionMetadata;
+import io.harness.pms.pipeline.PipelineEntity;
+import io.harness.pms.pipeline.service.PMSPipelineService;
 import io.harness.pms.resourceconstraints.response.ResourceConstraintDetailDTO;
 import io.harness.pms.resourceconstraints.response.ResourceConstraintExecutionInfoDTO;
 import io.harness.pms.resourceconstraints.service.PMSResourceConstraintServiceImpl;
@@ -41,11 +44,15 @@ import io.harness.steps.resourcerestraint.service.ResourceRestraintService;
 
 import com.google.common.collect.Lists;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 
 @OwnedBy(HarnessTeam.PIPELINE)
 public class PMSResourceConstraintServiceTest extends PipelineServiceTestBase {
@@ -56,12 +63,13 @@ public class PMSResourceConstraintServiceTest extends PipelineServiceTestBase {
   @Mock private ResourceRestraintService resourceRestraintService;
   @Mock private ResourceRestraintInstanceService resourceRestraintInstanceService;
   @Mock private PlanExecutionService planExecutionService;
+  @Mock private PMSPipelineService pipelineService;
   private PMSResourceConstraintServiceImpl pmsResourceConstraintService;
 
   @Before
   public void setUp() {
     pmsResourceConstraintService = new PMSResourceConstraintServiceImpl(
-        resourceRestraintService, resourceRestraintInstanceService, planExecutionService);
+        resourceRestraintService, resourceRestraintInstanceService, planExecutionService, pipelineService);
   }
 
   @Test
@@ -110,17 +118,24 @@ public class PMSResourceConstraintServiceTest extends PipelineServiceTestBase {
                 .releaseEntityId(PLAN_EXECUTION_ID + "2")
                 .order(3)
                 .build());
+    Map<String, String> setupAbstractions = new HashMap<>();
     List<PlanExecution> planExecutionList =
         Lists.newArrayList(PlanExecution.builder()
                                .uuid(PLAN_EXECUTION_ID)
+                               .setupAbstractions(setupAbstractions)
+                               .startTs(20L)
                                .metadata(ExecutionMetadata.newBuilder().setPipelineIdentifier("k8s").build())
                                .build(),
             PlanExecution.builder()
                 .uuid(PLAN_EXECUTION_ID + "1")
+                .setupAbstractions(setupAbstractions)
+                .startTs(10L)
                 .metadata(ExecutionMetadata.newBuilder().setPipelineIdentifier("rc-pipeline").build())
                 .build(),
             PlanExecution.builder()
                 .uuid(PLAN_EXECUTION_ID + "2")
+                .setupAbstractions(setupAbstractions)
+                .startTs(30L)
                 .metadata(ExecutionMetadata.newBuilder().setPipelineIdentifier("barriers-pipeline").build())
                 .build());
 
@@ -144,16 +159,19 @@ public class PMSResourceConstraintServiceTest extends PipelineServiceTestBase {
                              .pipelineIdentifier("rc-pipeline")
                              .planExecutionId(PLAN_EXECUTION_ID + "1")
                              .state(ACTIVE)
+                             .startTs(10L)
                              .build(),
             ResourceConstraintDetailDTO.builder()
                 .pipelineIdentifier("k8s")
                 .planExecutionId(PLAN_EXECUTION_ID)
                 .state(BLOCKED)
+                .startTs(20L)
                 .build(),
             ResourceConstraintDetailDTO.builder()
                 .pipelineIdentifier("barriers-pipeline")
                 .planExecutionId(PLAN_EXECUTION_ID + "2")
                 .state(BLOCKED)
+                .startTs(30L)
                 .build());
 
     verify(resourceRestraintService).getByNameAndAccountId(PmsConstants.QUEUING_RC_NAME, ACCOUNT_ID);
@@ -161,6 +179,32 @@ public class PMSResourceConstraintServiceTest extends PipelineServiceTestBase {
         .getAllByRestraintIdAndResourceUnitAndStates(
             resourceConstraint.getUuid(), RESOURCE_UNIT, Arrays.asList(ACTIVE, BLOCKED));
     verify(planExecutionService).findAllByPlanExecutionIdIn(any());
+  }
+
+  @Test
+  @Owner(developers = FERNANDOD)
+  @Category(UnitTests.class)
+  public void shouldGetPipelineNameCallRemoteServiceOnlyOnce() {
+    Map<String, String> setupAbstractions = new HashMap<>();
+    setupAbstractions.put("accountId", "A");
+    setupAbstractions.put("orgIdentifier", "B");
+    setupAbstractions.put("projectIdentifier", "C");
+    PlanExecution planExecution =
+        PlanExecution.builder()
+            .uuid(PLAN_EXECUTION_ID)
+            .setupAbstractions(setupAbstractions)
+            .metadata(ExecutionMetadata.newBuilder().setPipelineIdentifier("pipeline-id").build())
+            .build();
+
+    when(pipelineService.get("A", "B", "C", "pipeline-id", false))
+        .thenReturn(Optional.of(PipelineEntity.builder().name("pipeline-name").build()));
+
+    Map<String, PipelineEntity> cache = new HashMap<>();
+    assertThat(pmsResourceConstraintService.getPipelineName(cache, planExecution)).isEqualTo("pipeline-name");
+    assertThat(pmsResourceConstraintService.getPipelineName(cache, planExecution)).isEqualTo("pipeline-name");
+    assertThat(pmsResourceConstraintService.getPipelineName(cache, planExecution)).isEqualTo("pipeline-name");
+
+    verify(pipelineService, Mockito.times(1)).get("A", "B", "C", "pipeline-id", false);
   }
 
   private ResourceRestraint getResourceConstraint() {
