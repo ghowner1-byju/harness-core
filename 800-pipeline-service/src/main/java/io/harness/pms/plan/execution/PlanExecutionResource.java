@@ -22,6 +22,7 @@ import io.harness.accesscontrol.acl.api.ResourceScope;
 import io.harness.accesscontrol.clients.AccessControlClient;
 import io.harness.annotations.dev.HarnessTeam;
 import io.harness.annotations.dev.OwnedBy;
+import io.harness.apiexamples.PipelineAPIConstants;
 import io.harness.engine.executions.retry.RetryHistoryResponseDto;
 import io.harness.engine.executions.retry.RetryInfo;
 import io.harness.engine.executions.retry.RetryLatestExecutionResponseDto;
@@ -61,6 +62,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -149,10 +151,13 @@ public class PlanExecutionResource {
       @Parameter(description = PlanExecutionResourceConstants.PIPELINE_IDENTIFIER_PARAM_MESSAGE) @ResourceIdentifier
       @NotEmpty String pipelineIdentifier, @BeanParam GitEntityFindInfoDTO gitEntityBasicInfo,
       @QueryParam("useFQNIfError") @DefaultValue("false") boolean useFQNIfErrorResponse,
-      @ApiParam(hidden = true) @Parameter(
-          description =
-              "Enter Runtime Input YAML if the Pipeline contains Runtime Inputs. Please refer to https://ngdocs.harness.io/article/f6yobn7iq0 and https://ngdocs.harness.io/article/1eishcolt3 to see how to generate Runtime Input YAML for a Pipeline.")
-      String inputSetPipelineYaml) {
+      @ApiParam(hidden = true)
+      @RequestBody(description = "Enter Runtime Input YAML if the Pipeline contains Runtime Inputs", content = {
+        @Content(mediaType = "application/yaml",
+            examples = @ExampleObject(name = "Execute Runtime Input YAML",
+                summary = "Execute Pipeline with Runtime Input YAML", value = PipelineAPIConstants.EXECUTE_INPUT_YAML,
+                description = "Value can be fetched from Fetch Runtime Input Template API"))
+      }) String inputSetPipelineYaml) {
     PlanExecutionResponseDto planExecutionResponseDto = pipelineExecutor.runPipelineWithInputSetPipelineYaml(
         accountId, orgIdentifier, projectIdentifier, pipelineIdentifier, moduleType, inputSetPipelineYaml, false);
     return ResponseDTO.newResponse(planExecutionResponseDto);
