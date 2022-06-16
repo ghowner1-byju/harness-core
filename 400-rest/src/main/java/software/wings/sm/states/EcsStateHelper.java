@@ -155,7 +155,6 @@ import software.wings.sm.states.ContainerServiceSetup.ContainerServiceSetupKeys;
 import software.wings.sm.states.EcsSetupContextVariableHolder.EcsSetupContextVariableHolderBuilder;
 import software.wings.utils.EcsConvention;
 
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
@@ -592,9 +591,10 @@ public class EcsStateHelper {
       throw new InvalidArgumentsException(Pair.of("Cloud Provider", "Must be of type Aws Config"));
     }
     AwsConfig awsConfig = (AwsConfig) settingValue;
+    AwsHelperServiceManager.setAmazonClientSDKDefaultBackoffStrategyIfExists(executionContext,awsConfig);
     List<EncryptedDataDetail> encryptedDataDetails = secretManager.getEncryptionDetails(
         awsConfig, executionContext.getAppId(), executionContext.getWorkflowExecutionId());
-    AwsHelperServiceManager.setAmazonClientSDKDefaultBackoffStrategyIfExists(executionContext,awsConfig);
+
 
     return EcsRunTaskDataBag.builder()
         .applicationAccountId(app.getAccountId())
