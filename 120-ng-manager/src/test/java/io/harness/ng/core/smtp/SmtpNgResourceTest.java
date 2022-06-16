@@ -15,6 +15,7 @@ import static io.harness.rule.OwnerRule.MANKRIT;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
@@ -49,16 +50,16 @@ public class SmtpNgResourceTest extends CategoryTest {
   public void testIfAccessSuccessfully() {
     doNothing()
         .when(accessControlClient)
-        .checkForAccessOrThrow(
-            ResourceScope.of(any(), null, null), Resource.of(ResourceTypes.SMTP, null), EDIT_SMTP_PERMISSION, any());
+        .checkForAccessOrThrow(ResourceScope.of(any(), eq(null), eq(null)), Resource.of(ResourceTypes.SMTP, null),
+            EDIT_SMTP_PERMISSION, any());
     doNothing()
         .when(accessControlClient)
-        .checkForAccessOrThrow(
-            ResourceScope.of(any(), null, null), Resource.of(ResourceTypes.SMTP, null), DELETE_SMTP_PERMISSION, any());
+        .checkForAccessOrThrow(ResourceScope.of(any(), eq(null), eq(null)), Resource.of(ResourceTypes.SMTP, null),
+            DELETE_SMTP_PERMISSION, any());
     doNothing()
         .when(accessControlClient)
-        .checkForAccessOrThrow(
-            ResourceScope.of(any(), null, null), Resource.of(ResourceTypes.SMTP, null), VIEW_SMTP_PERMISSION, any());
+        .checkForAccessOrThrow(ResourceScope.of(any(), eq(null), eq(null)), Resource.of(ResourceTypes.SMTP, null),
+            VIEW_SMTP_PERMISSION, any());
     assertThat(smtpNgService).isNotNull();
   }
 }
