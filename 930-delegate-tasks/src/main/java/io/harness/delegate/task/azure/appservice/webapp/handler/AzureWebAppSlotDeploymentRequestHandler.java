@@ -39,8 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AzureWebAppSlotDeploymentRequestHandler
     extends AzureWebAppRequestHandler<AzureWebAppSlotDeploymentRequest> {
-  @Inject private AzureAppServiceResourceUtilities azureAppServiceResourceUtilities;
-
   @Override
   protected AzureWebAppRequestResponse execute(AzureWebAppSlotDeploymentRequest taskRequest, AzureConfig azureConfig,
       AzureLogCallbackProvider logCallbackProvider) {

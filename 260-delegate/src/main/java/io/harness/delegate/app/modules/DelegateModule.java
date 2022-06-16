@@ -169,6 +169,7 @@ import io.harness.delegate.task.azure.appservice.AzureAppServiceTaskParameters.A
 import io.harness.delegate.task.azure.appservice.webapp.AzureWebAppTaskNG;
 import io.harness.delegate.task.azure.appservice.webapp.handler.AzureWebAppRequestHandler;
 import io.harness.delegate.task.azure.appservice.webapp.handler.AzureWebAppSlotDeploymentRequestHandler;
+import io.harness.delegate.task.azure.appservice.webapp.handler.AzureWebAppTrafficShiftRequestHandler;
 import io.harness.delegate.task.azure.appservice.webapp.ng.AzureWebAppRequestType;
 import io.harness.delegate.task.azure.arm.AzureARMTaskParameters;
 import io.harness.delegate.task.azure.resource.operation.AzureResourceProvider;
@@ -1281,6 +1282,8 @@ public class DelegateModule extends AbstractModule {
         MapBinder.newMapBinder(binder(), String.class, AzureWebAppRequestHandler.class);
     azureWebAppRequestTypeToRequestHandlerMap.addBinding(AzureWebAppRequestType.SLOT_DEPLOYMENT.name())
         .to(AzureWebAppSlotDeploymentRequestHandler.class);
+    azureWebAppRequestTypeToRequestHandlerMap.addBinding(AzureWebAppRequestType.SLOT_TRAFFIC_SHIFT.name())
+        .to(AzureWebAppTrafficShiftRequestHandler.class);
 
     // Ssh and WinRM task handlers
     MapBinder<String, CommandHandler> commandUnitHandlers =
