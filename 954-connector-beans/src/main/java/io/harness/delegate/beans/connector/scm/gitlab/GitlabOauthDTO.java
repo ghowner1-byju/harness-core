@@ -21,7 +21,7 @@ import lombok.experimental.FieldDefaults;
 @Schema(name = "GitlabOauth",
         description = "This contains details of the information such as references of tokens needed for Gitlab API access")
 public class GitlabOauthDTO implements GitlabApiAccessSpecDTO, GitlabHttpCredentialsSpecDTO {
-    public static String userName = "Oauth";
+    public static String userName = "oauth2";
     @ApiModelProperty(dataType = "string") @NotNull @SecretReference SecretRefData tokenRef;
     @ApiModelProperty(dataType = "string") @NotNull @SecretReference SecretRefData refreshTokenRef;
 }
