@@ -148,7 +148,7 @@ public class SecretCrudServiceImpl implements SecretCrudService {
     if (SecretText.equals(dto.getType()) && isEmpty(((SecretTextSpecDTO) dto.getSpec()).getValue())) {
       throw new InvalidRequestException("value cannot be empty for a secret text.");
     }
-   boolean isHarnessManaged = checkIfSecretManagerUsedIsHarnessManaged(accountIdentifier, dto);
+    boolean isHarnessManaged = checkIfSecretManagerUsedIsHarnessManaged(accountIdentifier, dto);
     GovernanceMetadata governanceMetadata = null;
     SecretResponseWrapper secretResponseWrapper = SecretResponseWrapper.builder().build();
 

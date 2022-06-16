@@ -42,7 +42,7 @@ public class OpaSecretServiceImpl implements OpaSecretService{
         OpaEvaluationContext context;
 
         try {
-            String expandedYaml = getConnectorYaml(secretDTO);
+            String expandedYaml = getSecretYaml(secretDTO);
             context = opaService.createEvaluationContext(expandedYaml, OpaConstants.OPA_EVALUATION_TYPE_SECRET);
             return opaService.evaluate(context, accountId, orgIdentifier, projectIdentifier, identifier, action,
                     OpaConstants.OPA_EVALUATION_TYPE_SECRET);
@@ -54,7 +54,7 @@ public class OpaSecretServiceImpl implements OpaSecretService{
         }
     }
 
-    private String getConnectorYaml(SecretDTOV2 secretDTO) {
+    private String getSecretYaml(SecretDTOV2 secretDTO) {
         String connectorYaml = null;
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()
                 .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
