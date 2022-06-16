@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.harness.category.element.UnitTests;
 import io.harness.exception.ExceptionUtils;
+import io.harness.exception.SCMExceptionErrorMessages;
 import io.harness.exception.ScmBadRequestException;
 import io.harness.exception.ScmUnauthorizedException;
 import io.harness.exception.ScmUnexpectedException;
@@ -60,7 +61,7 @@ public class AdoGetFileScmApiErrorHandlerTest extends GitSyncTestBase {
     } catch (Exception ex) {
       WingsException exception = ExceptionUtils.cause(ScmBadRequestException.class, ex);
       assertThat(exception).isNotNull();
-      assertThat(exception.getMessage()).isEqualTo(errorMessage);
+      assertThat(exception.getMessage()).isEqualTo(SCMExceptionErrorMessages.FILE_NOT_FOUND_ERROR);
     }
   }
 
