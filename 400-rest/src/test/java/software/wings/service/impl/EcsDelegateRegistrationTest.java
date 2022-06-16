@@ -110,7 +110,9 @@ public class EcsDelegateRegistrationTest {
     JreConfig oracleJreConfig = JreConfig.builder().version("1.8.0_191").build();
     HashMap<String, JreConfig> jreConfigMap = new HashMap<>();
     jreConfigMap.put("oracle8u191", oracleJreConfig);
+    jreConfigMap.put("openjdk11014_9", JreConfig.builder().version("11.0.14").build());
     doReturn("oracle8u191").when(mainConfiguration).getCurrentJre();
+    when(mainConfiguration.getMigrateToJre()).thenReturn("openjdk11014_9");
     doReturn(jreConfigMap).when(mainConfiguration).getJreConfigs();
 
     underTest.handleEcsDelegateRequest(requestDelegate);

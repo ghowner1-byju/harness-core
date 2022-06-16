@@ -4225,7 +4225,7 @@ public class DelegateServiceTest extends WingsBaseTest {
         .build();
   }
 
-  private static JreConfig getOpenjdk11JreConfig() {
+  public static JreConfig getOpenjdk11JreConfig() {
     return JreConfig.builder()
         .version("11.0.14")
         .jreDirectory("jdk-11.0.14+9-jre")

@@ -1665,7 +1665,7 @@ public class DelegateServiceImpl implements DelegateService {
       out.closeArchiveEntry();
 
       File stop = File.createTempFile("stop", ".sh");
-      saveProcessedTemplate(scriptParams, stop, "stop.sh.ftl");
+      saveProcessedTemplate(watcherScriptParams, stop, "stop.sh.ftl");
       stop = new File(stop.getAbsolutePath());
       TarArchiveEntry stopTarArchiveEntry = new TarArchiveEntry(stop, DELEGATE_DIR + "/stop.sh");
       stopTarArchiveEntry.setMode(0755);
