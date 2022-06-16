@@ -17,6 +17,7 @@ import io.harness.redis.RedisConfig;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +30,7 @@ public class DebeziumControllerStarter {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public void startDebeziumController(DebeziumConfig debeziumConfig, ChangeConsumerConfig changeConsumerConfig,
       PersistentLocker locker, RedisConfig redisLockConfig) {
-    String[] collections = debeziumConfig.getCollectionIncludeList().split(",");
+    List<String> collections = debeziumConfig.getMonitoredCollections();
     for (String monitoredCollection : collections) {
       try {
         MongoCollectionChangeConsumer changeConsumer = consumerFactory.get(monitoredCollection, changeConsumerConfig);
