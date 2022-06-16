@@ -187,7 +187,8 @@ public class K8sBGRequestHandler extends K8sRequestHandler {
     if (k8sBGDeployRequest.isPruningEnabled()) {
       LogCallback pruneExecutionLogCallback =
           k8sTaskHelperBase.getLogCallback(logStreamingTaskClient, Prune, true, commandUnitsProgress);
-      pruneForBg(k8sDelegateTaskParams, pruneExecutionLogCallback);
+      k8sBGBaseHandler.pruneForBg(k8sDelegateTaskParams, pruneExecutionLogCallback, primaryColor, stageColor,
+          prePruningInfo, currentRelease, client);
     }
 
     wrapUpLogCallback.saveExecutionLog("\nDone.", INFO, CommandExecutionStatus.SUCCESS);
@@ -346,9 +347,6 @@ public class K8sBGRequestHandler extends K8sRequestHandler {
 
     stageColor = k8sBGBaseHandler.getInverseColor(primaryColor);
 
-    currentRelease = releaseHistory.createNewRelease(
-        resources.stream().map(KubernetesResource::getResourceId).collect(Collectors.toList()));
-
     if (isPruningEnabled) {
       currentRelease = releaseHistory.createNewReleaseWithResourceMap(
           resources.stream().filter(resource -> !resource.isSkipPruning()).collect(toList()));
@@ -379,56 +377,5 @@ public class K8sBGRequestHandler extends K8sRequestHandler {
         + color(managedWorkload.getResourceId().kindNameRef(), k8sBGBaseHandler.getLogColor(stageColor), Bold));
 
     executionLogCallback.saveExecutionLog("\nDone.", INFO, CommandExecutionStatus.SUCCESS);
-  }
-
-  public List<KubernetesResourceId> pruneForBg(
-      K8sDelegateTaskParams k8sDelegateTaskParams, LogCallback executionLogCallback) {
-    // Todo: Investigate when this case is possible
-    try {
-      if (StringUtils.equals(primaryColor, stageColor)) {
-        executionLogCallback.saveExecutionLog("Primary and secondary service are at same color, No pruning required.");
-        return emptyList();
-      }
-      ReleaseHistory oldReleaseHistory = prePruningInfo.getReleaseHistoryBeforeStageCleanUp();
-
-      if (oldReleaseHistory == null || isEmpty(oldReleaseHistory.getReleases())) {
-        executionLogCallback.saveExecutionLog(
-            "No older releases are available in release history, No pruning Required.");
-        return emptyList();
-      }
-
-      executionLogCallback.saveExecutionLog(
-          "Primary Service is at color: " + k8sBGBaseHandler.encodeColor(primaryColor));
-      executionLogCallback.saveExecutionLog("Stage Service is at color: " + k8sBGBaseHandler.encodeColor(stageColor));
-      executionLogCallback.saveExecutionLog("Pruning up resources in non primary releases");
-
-      Set<KubernetesResourceId> resourcesUsedInPrimaryReleases =
-          k8sBGBaseHandler.getResourcesUsedInPrimaryReleases(oldReleaseHistory, currentRelease, primaryColor);
-      Set<KubernetesResourceId> resourcesInCurrentRelease = new HashSet<>(currentRelease.getResources());
-      Set<KubernetesResourceId> alreadyDeletedResources = new HashSet<>(prePruningInfo.getDeletedResourcesInStage());
-      List<KubernetesResourceId> resourcesPruned = new ArrayList<>();
-
-      for (int releaseIndex = oldReleaseHistory.getReleases().size() - 1; releaseIndex >= 0; releaseIndex--) {
-        // deleting resources per release seems safer and more accountable
-        Release release = oldReleaseHistory.getReleases().get(releaseIndex);
-        if (k8sBGBaseHandler.isReleaseAssociatedWithStage(stageColor, currentRelease, release)) {
-          List<KubernetesResourceId> resourcesDeleted =
-              k8sBGBaseHandler.pruneInternalForStageRelease(k8sDelegateTaskParams, executionLogCallback, client,
-                  resourcesUsedInPrimaryReleases, resourcesInCurrentRelease, alreadyDeletedResources, release);
-          resourcesPruned.addAll(resourcesDeleted);
-          // to handle the case where multiple stage releases have same undesired resources for current release
-          alreadyDeletedResources.addAll(resourcesDeleted);
-        }
-      }
-      if (isEmpty(resourcesPruned)) {
-        executionLogCallback.saveExecutionLog("No resources needed to be pruned", INFO, RUNNING);
-      }
-      executionLogCallback.saveExecutionLog("Pruning step completed", INFO, SUCCESS);
-      return resourcesPruned;
-    } catch (Exception ex) {
-      executionLogCallback.saveExecutionLog("Failed to delete resources while pruning", WARN, RUNNING);
-      executionLogCallback.saveExecutionLog(getMessage(ex), WARN, SUCCESS);
-      return emptyList();
-    }
   }
 }
