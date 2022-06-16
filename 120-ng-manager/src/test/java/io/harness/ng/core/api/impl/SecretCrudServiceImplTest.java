@@ -52,6 +52,7 @@ import io.harness.ng.core.models.Secret;
 import io.harness.ng.core.models.SecretTextSpec;
 import io.harness.ng.core.remote.SSHKeyValidationMetadata;
 import io.harness.ng.core.remote.SecretValidationResultDTO;
+import io.harness.ng.opa.entities.secret.OpaSecretService;
 import io.harness.rule.Owner;
 import io.harness.secretmanagerclient.SecretType;
 import io.harness.secretmanagerclient.ValueType;
@@ -89,12 +90,13 @@ public class SecretCrudServiceImplTest extends CategoryTest {
   @Mock private NGEncryptedDataService encryptedDataService;
   @Mock private NGAccountSettingService accountSettingService;
   @Mock private NGConnectorSecretManagerService connectorService;
+   @Mock private OpaSecretService opaSecretService;
 
   @Before
   public void setup() {
     initMocks(this);
     secretCrudServiceSpy = new SecretCrudServiceImpl(secretEntityReferenceHelper, fileUploadLimit, ngSecretServiceV2,
-        eventProducer, encryptedDataService, accountSettingService, connectorService);
+        eventProducer, encryptedDataService, accountSettingService, connectorService, opaSecretService);
     secretCrudService = spy(secretCrudServiceSpy);
   }
 

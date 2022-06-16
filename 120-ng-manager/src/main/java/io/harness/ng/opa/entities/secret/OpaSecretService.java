@@ -1,13 +1,13 @@
 package io.harness.ng.opa.entities.secret;
 
 import io.harness.annotations.dev.OwnedBy;
-import io.harness.connector.ConnectorDTO;
-import io.harness.secretmanagerclient.dto.SecretDTO;
+import io.harness.ng.core.dto.secrets.SecretDTOV2;
+import io.harness.pms.contracts.governance.GovernanceMetadata;
 
 import static io.harness.annotations.dev.HarnessTeam.PL;
 
 @OwnedBy(PL)
 public interface OpaSecretService {
-    GovernanceMetadata evaluatePoliciesWithEntity(String accountId, SecretDTO secretDTO, String orgIdentifier,
+    GovernanceMetadata evaluatePoliciesWithEntity(String accountId, SecretDTOV2 secretDTO, String orgIdentifier,
                                                   String projectIdentifier, String action, String identifier);
 }

@@ -48,6 +48,9 @@ import io.harness.ng.core.models.Secret.SecretKeys;
 import io.harness.ng.core.models.SecretTextSpec;
 import io.harness.ng.core.remote.SecretValidationMetaData;
 import io.harness.ng.core.remote.SecretValidationResultDTO;
+import io.harness.ng.opa.entities.secret.OpaSecretService;
+import io.harness.opaclient.model.OpaConstants;
+import io.harness.pms.contracts.governance.GovernanceMetadata;
 import io.harness.secretmanagerclient.SecretType;
 import io.harness.secretmanagerclient.ValueType;
 import io.harness.secretmanagerclient.dto.SecretManagerConfigDTO;
@@ -82,12 +85,13 @@ public class SecretCrudServiceImpl implements SecretCrudService {
   private final NGEncryptedDataService encryptedDataService;
   private final NGAccountSettingService accountSettingService;
   private final NGConnectorSecretManagerService ngConnectorSecretManagerService;
+  private final OpaSecretService opaSecretService;
 
   @Inject
   public SecretCrudServiceImpl(SecretEntityReferenceHelper secretEntityReferenceHelper, FileUploadLimit fileUploadLimit,
       NGSecretServiceV2 ngSecretService, @Named(ENTITY_CRUD) Producer eventProducer,
       NGEncryptedDataService encryptedDataService, NGAccountSettingService accountSettingService,
-      NGConnectorSecretManagerService ngConnectorSecretManagerService) {
+      NGConnectorSecretManagerService ngConnectorSecretManagerService,OpaSecretService opaSecretService) {
     this.fileUploadLimit = fileUploadLimit;
     this.secretEntityReferenceHelper = secretEntityReferenceHelper;
     this.ngSecretService = ngSecretService;
@@ -95,6 +99,7 @@ public class SecretCrudServiceImpl implements SecretCrudService {
     this.encryptedDataService = encryptedDataService;
     this.accountSettingService = accountSettingService;
     this.ngConnectorSecretManagerService = ngConnectorSecretManagerService;
+    this.opaSecretService = opaSecretService;
   }
 
   private void checkEqualityOrThrow(Object str1, Object str2) {
@@ -143,11 +148,21 @@ public class SecretCrudServiceImpl implements SecretCrudService {
     if (SecretText.equals(dto.getType()) && isEmpty(((SecretTextSpecDTO) dto.getSpec()).getValue())) {
       throw new InvalidRequestException("value cannot be empty for a secret text.");
     }
+   boolean isHarnessManaged = checkIfSecretManagerUsedIsHarnessManaged(accountIdentifier, dto);
+    GovernanceMetadata governanceMetadata = null;
+    SecretResponseWrapper secretResponseWrapper = SecretResponseWrapper.builder().build();
+    if(!isHarnessManaged){
+      governanceMetadata = opaSecretService.evaluatePoliciesWithEntity(accountIdentifier,dto, dto.getOrgIdentifier(), dto.getProjectIdentifier(),OpaConstants.OPA_EVALUATION_ACTION_CONNECTOR_SAVE,dto.getIdentifier());
+      secretResponseWrapper.setGovernanceMetadata(governanceMetadata);
+      if (governanceMetadata != null && OpaConstants.OPA_STATUS_ERROR.equals(governanceMetadata.getStatus())) {
+        return secretResponseWrapper;
+      }
+    }
 
     boolean isBuiltInSMDisabled =
         accountSettingService.getIsBuiltInSMDisabled(accountIdentifier, null, null, AccountSettingType.CONNECTOR);
 
-    if (isBuiltInSMDisabled && checkIfSecretManagerUsedIsHarnessManaged(accountIdentifier, dto)) {
+    if (isBuiltInSMDisabled && isHarnessManaged) {
       throw new InvalidRequestException("Built-in Harness Secret Manager cannot be used to create Secret.");
     }
 
@@ -155,12 +170,16 @@ public class SecretCrudServiceImpl implements SecretCrudService {
       case SecretText:
         NGEncryptedData encryptedData = encryptedDataService.createSecretText(accountIdentifier, dto);
         if (Optional.ofNullable(encryptedData).isPresent()) {
-          return createSecretInternal(accountIdentifier, dto, false);
+          secretResponseWrapper = createSecretInternal(accountIdentifier, dto, false);
+          secretResponseWrapper.setGovernanceMetadata(governanceMetadata);
+          return secretResponseWrapper;
         }
         break;
       case SSHKey:
       case WinRmCredentials:
-        return createSecretInternal(accountIdentifier, dto, false);
+        secretResponseWrapper= createSecretInternal(accountIdentifier, dto, false);
+      secretResponseWrapper.setGovernanceMetadata(governanceMetadata);
+      return secretResponseWrapper;
       default:
         throw new IllegalArgumentException("Invalid secret type provided: " + dto.getType());
     }

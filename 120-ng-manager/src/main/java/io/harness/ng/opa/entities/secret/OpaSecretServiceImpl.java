@@ -4,16 +4,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.google.inject.Inject;
 import io.harness.account.AccountClient;
 import io.harness.annotations.dev.OwnedBy;
 import io.harness.beans.FeatureName;
-import io.harness.connector.ConnectorDTO;
+import io.harness.ng.core.dto.secrets.SecretDTOV2;
 import io.harness.ng.opa.OpaEvaluationContext;
 import io.harness.ng.opa.OpaService;
 import io.harness.opaclient.model.OpaConstants;
 import io.harness.pms.contracts.governance.GovernanceMetadata;
 import io.harness.remote.client.RestClientUtils;
-import io.harness.secretmanagerclient.dto.SecretDTO;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
@@ -26,7 +28,7 @@ public class OpaSecretServiceImpl implements OpaSecretService{
     private OpaService opaService;
     private AccountClient accountClient;
 
-    public  GovernanceMetadata evaluatePoliciesWithEntity(String accountId, SecretDTO secretDTO, String orgIdentifier,
+    public  GovernanceMetadata evaluatePoliciesWithEntity(String accountId, SecretDTOV2 secretDTO, String orgIdentifier,
                                                           String projectIdentifier, String action, String identifier) {
         if (!RestClientUtils.getResponse(
                 accountClient.isFeatureFlagEnabled(FeatureName.OPA_SECRET_GOVERNANCE.name(), accountId))) {
@@ -52,7 +54,7 @@ public class OpaSecretServiceImpl implements OpaSecretService{
         }
     }
 
-    private String getConnectorYaml(SecretDTO secretDTO) {
+    private String getConnectorYaml(SecretDTOV2 secretDTO) {
         String connectorYaml = null;
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()
                 .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
