@@ -24,8 +24,6 @@ import static software.wings.beans.LogColor.Yellow;
 import static software.wings.beans.LogHelper.color;
 import static software.wings.beans.LogWeight.Bold;
 
-import static java.util.Collections.emptySet;
-
 import io.harness.annotations.dev.OwnedBy;
 import io.harness.delegate.beans.logstreaming.CommandUnitsProgress;
 import io.harness.delegate.beans.logstreaming.ILogStreamingTaskClient;
@@ -41,7 +39,6 @@ import io.harness.exception.InvalidArgumentsException;
 import io.harness.k8s.kubectl.Kubectl;
 import io.harness.k8s.model.K8sDelegateTaskParams;
 import io.harness.k8s.model.KubernetesResourceId;
-import io.harness.logging.CommandExecutionStatus;
 import io.harness.logging.LogCallback;
 
 import com.google.common.annotations.VisibleForTesting;

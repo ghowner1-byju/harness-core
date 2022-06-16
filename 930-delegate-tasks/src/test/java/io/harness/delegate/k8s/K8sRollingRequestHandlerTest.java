@@ -39,10 +39,12 @@ import io.harness.delegate.beans.logstreaming.ILogStreamingTaskClient;
 import io.harness.delegate.task.k8s.ContainerDeploymentDelegateBaseHelper;
 import io.harness.delegate.task.k8s.K8sDeployResponse;
 import io.harness.delegate.task.k8s.K8sInfraDelegateConfig;
+import io.harness.delegate.task.k8s.K8sManifestDelegateConfig;
 import io.harness.delegate.task.k8s.K8sRollingDeployRequest;
 import io.harness.delegate.task.k8s.K8sRollingDeployResponse;
 import io.harness.delegate.task.k8s.K8sTaskHelperBase;
 import io.harness.delegate.task.k8s.KustomizeManifestDelegateConfig;
+import io.harness.delegate.task.k8s.ManifestDelegateConfig;
 import io.harness.exception.InvalidRequestException;
 import io.harness.k8s.KubernetesContainerService;
 import io.harness.k8s.kubectl.Kubectl;
@@ -164,7 +166,11 @@ public class K8sRollingRequestHandlerTest extends CategoryTest {
   public void testExecuteTaskInternalWithPruning() throws Exception {
     K8sDelegateTaskParams delegateTaskParams = K8sDelegateTaskParams.builder().build();
     K8sRollingDeployRequest deployRequestWithPruningEnabled =
-        K8sRollingDeployRequest.builder().releaseName("releaseName").pruningEnabled(true).build();
+        K8sRollingDeployRequest.builder()
+            .releaseName("releaseName")
+            .pruningEnabled(true)
+            .manifestDelegateConfig(K8sManifestDelegateConfig.builder().build())
+            .build();
     List<KubernetesResourceId> prunedResourceIds = singletonList(KubernetesResourceId.builder().build());
     doReturn(prunedResourceIds).when(rollingRequestHandler).prune(any(), any(), any());
 

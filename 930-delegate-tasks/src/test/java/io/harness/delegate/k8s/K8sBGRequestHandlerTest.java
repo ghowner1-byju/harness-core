@@ -230,7 +230,7 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
                                k8sBGDeployRequest, k8sDelegateTaskParams, logStreamingTaskClient, commandUnitsProgress))
         .isSameAs(runtimeException);
     verify(k8sBGRequestHandler, never())
-        .prepareForBlueGreen(any(K8sDelegateTaskParams.class), any(LogCallback.class), anyBoolean(), false);
+        .prepareForBlueGreen(any(K8sDelegateTaskParams.class), any(LogCallback.class), anyBoolean(), anyBoolean());
     verify(k8sTaskHelperBase, never())
         .saveReleaseHistoryInConfigMap(any(KubernetesConfig.class), anyString(), anyString());
   }
