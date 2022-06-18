@@ -221,13 +221,11 @@ public class CreatePRStep extends TaskChainExecutableWithRollbackAndRbac {
     OptionalSweepingOutput optionalSweepingOutput = executionSweepingOutputService.resolveOptional(
         ambiance, RefObjectUtils.getOutcomeRefObject(GitopsClustersStep.GITOPS_SWEEPING_OUTPUT));
 
-    Map<String, Map<String, String>> filePathsToVariables = null;
+    Map<String, Map<String, String>> filePathsToVariables = new HashMap<>();
 
     if (optionalSweepingOutput != null && optionalSweepingOutput.isFound()) {
       GitopsClustersOutcome output = (GitopsClustersOutcome) optionalSweepingOutput.getOutput();
       List<GitopsClustersOutcome.ClusterData> clustersData = output.getClustersData();
-
-      filePathsToVariables = new HashMap<>();
 
       String file = Strings.EMPTY;
 

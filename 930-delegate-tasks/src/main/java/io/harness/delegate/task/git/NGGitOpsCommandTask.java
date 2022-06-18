@@ -355,7 +355,7 @@ public class NGGitOpsCommandTask extends AbstractDelegateRunnableTask {
    * in the stringObjectMap
    * @param fileContent
    * @param stringObjectMap
-   * @return
+   * @return Updated file content with new keys
    * @throws ParseException
    * @throws JsonProcessingException
    */
