@@ -164,7 +164,7 @@ public class PipelineExecutionSummaryCDChangeEventHandler extends RedisAbstractH
     try {
       dsl.insertInto(Tables.PIPELINE_EXECUTION_SUMMARY_CD)
           .set(record)
-          .onConflict(Tables.PIPELINE_EXECUTION_SUMMARY_CD.ID)
+          .onConflict(Tables.PIPELINE_EXECUTION_SUMMARY_CD.ID, Tables.PIPELINE_EXECUTION_SUMMARY_CD.STARTTS)
           .doNothing()
           .execute();
     } catch (DataAccessException ex) {
@@ -198,10 +198,9 @@ public class PipelineExecutionSummaryCDChangeEventHandler extends RedisAbstractH
     try {
       dsl.insertInto(Tables.PIPELINE_EXECUTION_SUMMARY_CD)
           .set(record)
-          .onConflict(Tables.PIPELINE_EXECUTION_SUMMARY_CD.ID)
+          .onConflict(Tables.PIPELINE_EXECUTION_SUMMARY_CD.ID, Tables.PIPELINE_EXECUTION_SUMMARY_CD.STARTTS)
           .doUpdate()
           .set(record)
-          .where(Tables.PIPELINE_EXECUTION_SUMMARY_CD.ID.eq(id))
           .execute();
     } catch (DataAccessException ex) {
       log.error("Caught Exception while updating data", ex);
