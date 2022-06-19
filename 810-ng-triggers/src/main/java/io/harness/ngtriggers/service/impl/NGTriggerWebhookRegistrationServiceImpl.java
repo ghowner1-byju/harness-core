@@ -64,11 +64,15 @@ public class NGTriggerWebhookRegistrationServiceImpl implements NGTriggerWebhook
     String repoName = ngTriggerEntity.getMetadata().getWebhook().getGit().getRepoName();
     NGTriggerConfigV2 ngTriggerConfig = ngTriggerElementMapper.toTriggerConfigV2(ngTriggerEntity.getYaml());
 
-    if (connectorUtils.getConnectionType(connectorDetails).equals(GitConnectionType.ACCOUNT) && isNotEmpty(repoName)) {
-      if (connectorDetails.getConnectorType() == ConnectorType.AZURE_REPO) {
-        url = getCompleteUrlForAzure(url, repoName, ngTriggerConfig);
+    if (connectorUtils.getConnectionType(connectorDetails).equals(GitConnectionType.ACCOUNT)) {
+      if (isNotEmpty(repoName)) {
+        if (connectorDetails.getConnectorType() == ConnectorType.AZURE_REPO) {
+          url = getCompleteUrlForAzure(url, repoName, ngTriggerConfig);
+        } else {
+          url = format("%s/%s", stripEnd(url, "/"), stripStart(repoName, "/"));
+        }
       } else {
-        url = format("%s/%s", stripEnd(url, "/"), stripStart(repoName, "/"));
+        log.warn("Repo name is empty for account level connector");
       }
     }
 

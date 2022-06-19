@@ -121,8 +121,10 @@ public class ScmGitWebhookHelper {
           .build();
     } else if (scmConnector instanceof AzureRepoConnectorDTO) {
       Set<AzureWebhookEvent> azureWebhookEvent = new HashSet<>();
-      existingNativeEventsList.forEach(
-          nativeEvents -> azureWebhookEvent.addAll(nativeEvents.getAzure().getEventsList()));
+      if (existingNativeEventsList != null) {
+        existingNativeEventsList.forEach(
+            nativeEvents -> azureWebhookEvent.addAll(nativeEvents.getAzure().getEventsList()));
+      }
       azureWebhookEvent.addAll(gitWebhookDetails.getHookEventType().azureWebhookEvents);
       return createWebhookRequestBuilder.setName("HarnessWebhook")
           .setNativeEvents(NativeEvents.newBuilder()

@@ -622,7 +622,7 @@ public class ScmServiceClientImpl implements ScmServiceClient {
     String slug = scmGitProviderHelper.getSlug(scmConnector);
     Provider gitProvider = scmGitProviderMapper.mapToSCMGitProvider(scmConnector);
     CreateWebhookRequest createWebhookRequest =
-        getCreateWebhookRequest(slug, gitProvider, gitWebhookDetails, scmConnector, null, null);
+        getCreateWebhookRequest(slug, gitProvider, gitWebhookDetails, scmConnector, null, Collections.emptyList());
     CreateWebhookResponse createWebhookResponse =
         ScmGrpcClientUtils.retryAndProcessException(scmBlockingStub::createWebhook, createWebhookRequest);
     ScmResponseStatusUtils.checkScmResponseStatusAndThrowException(
@@ -632,23 +632,23 @@ public class ScmServiceClientImpl implements ScmServiceClient {
 
   private CreateWebhookResponse createWebhook(ScmConnector scmConnector, GitWebhookDetails gitWebhookDetails,
       SCMGrpc.SCMBlockingStub scmBlockingStub, WebhookResponse exisitingWebhook,
-      List<NativeEvents> exisitingNativeEventsList) {
+      List<NativeEvents> existingNativeEventsList) {
     String slug = scmGitProviderHelper.getSlug(scmConnector);
     Provider gitProvider = scmGitProviderMapper.mapToSCMGitProvider(scmConnector);
     CreateWebhookRequest createWebhookRequest = getCreateWebhookRequest(
-       slug, gitProvider, gitWebhookDetails, scmConnector, exisitingWebhook, exisitingNativeEventsList);
+       slug, gitProvider, gitWebhookDetails, scmConnector, exisitingWebhook, existingNativeEventsList);
     return ScmGrpcClientUtils.retryAndProcessException(scmBlockingStub::createWebhook, createWebhookRequest);
   }
 
   private CreateWebhookRequest getCreateWebhookRequest(String slug, Provider gitProvider,
       GitWebhookDetails gitWebhookDetails, ScmConnector scmConnector, WebhookResponse identicalTarget,
-      List<NativeEvents> exisitingNativeEventsList) {
+      List<NativeEvents> existingNativeEventsList) {
     final CreateWebhookRequest.Builder createWebhookRequestBuilder = CreateWebhookRequest.newBuilder()
                                                                          .setSlug(slug)
                                                                          .setProvider(gitProvider)
                                                                          .setTarget(gitWebhookDetails.getTarget());
     return ScmGitWebhookHelper.getCreateWebhookRequest(
-        createWebhookRequestBuilder, gitWebhookDetails, scmConnector, identicalTarget, exisitingNativeEventsList);
+        createWebhookRequestBuilder, gitWebhookDetails, scmConnector, identicalTarget, existingNativeEventsList);
   }
 
   @Override
@@ -682,6 +682,7 @@ public class ScmServiceClientImpl implements ScmServiceClient {
     List<NativeEvents> allNativeEventsList = isNotEmpty(webhooksList)
         ? webhooksList.stream().map(WebhookResponse::getNativeEvents).collect(toList())
         : Collections.emptyList();
+    // This is being used only for Azure since it supports only single event per hook.
     List<NativeEvents> existingNativeEventsList = new ArrayList<>();
 
     for (WebhookResponse webhookResponse : webhooksList) {
