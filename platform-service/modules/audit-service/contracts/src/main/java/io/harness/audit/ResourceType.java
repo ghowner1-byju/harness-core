@@ -41,8 +41,7 @@ public enum ResourceType {
   MONITORED_SERVICE(ResourceTypeConstants.MONITORED_SERVICE),
   CHAOS_AGENT(ResourceTypeConstants.CHAOS_AGENT),
   CHAOS_WORKFLOW(ResourceTypeConstants.CHAOS_WORKFLOW),
-  SMTP(ResourceTypeConstants.SMTP);
-  SERVICE_LEVEL_OBJECTIVE(ResourceTypeConstants.SERVICE_LEVEL_OBJECTIVE);
+  SERVICE_LEVEL_OBJECTIVE(ResourceTypeConstants.SERVICE_LEVEL_OBJECTIVE),
   SMTP(ResourceTypeConstants.SMTP);
   
   ResourceType(String resourceType) {
