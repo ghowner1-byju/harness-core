@@ -46,9 +46,9 @@ public class ScmGitRefManager {
         format("Failed call to fetch codebase metadata: [%s] after retrying {} times", connectorIdentifier));
 
     if (isNotEmpty(branch)) {
-      final GetLatestCommitResponse latestCommitResponse = Failsafe.with(retryPolicy).get(() -> {
-        return scmServiceClient.getLatestCommit(scmConnector, branch, null, scmBlockingStub);
-      });
+      final GetLatestCommitResponse latestCommitResponse =
+          Failsafe.with(retryPolicy)
+              .get(() -> scmServiceClient.getLatestCommit(scmConnector, branch, null, scmBlockingStub));
       ScmResponseStatusUtils.checkScmResponseStatusAndThrowException(
           latestCommitResponse.getStatus(), latestCommitResponse.getError());
       return ScmGitRefTaskResponseData.builder()
@@ -58,11 +58,12 @@ public class ScmGitRefManager {
           .getLatestCommitResponse(latestCommitResponse.toByteArray())
           .build();
     } else if (isNotEmpty(prNumber)) {
-      FindPRResponse findPRResponse = Failsafe.with(retryPolicy).get(() -> {
-        return scmServiceClient.findPR(scmConnector, Long.parseLong(prNumber), scmBlockingStub);
-      });
+      FindPRResponse findPRResponse =
+          Failsafe.with(retryPolicy)
+              .get(() -> scmServiceClient.findPR(scmConnector, Long.parseLong(prNumber), scmBlockingStub));
       ListCommitsInPRResponse listCommitsInPRResponse =
-          scmServiceClient.listCommitsInPR(scmConnector, Long.parseLong(prNumber), scmBlockingStub);
+          Failsafe.with(retryPolicy)
+              .get(() -> scmServiceClient.listCommitsInPR(scmConnector, Long.parseLong(prNumber), scmBlockingStub));
       return ScmGitRefTaskResponseData.builder()
           .gitRefType(GitRefType.PULL_REQUEST_WITH_COMMITS)
           .repoUrl(scmConnector.getUrl())
@@ -70,9 +71,9 @@ public class ScmGitRefManager {
           .listCommitsInPRResponse(listCommitsInPRResponse.toByteArray())
           .build();
     } else if (isNotEmpty(tag)) {
-      final GetLatestCommitResponse latestCommitResponse = Failsafe.with(retryPolicy).get(() -> {
-        return scmServiceClient.getLatestCommit(scmConnector, null, tag, scmBlockingStub);
-      });
+      final GetLatestCommitResponse latestCommitResponse =
+          Failsafe.with(retryPolicy)
+              .get(() -> scmServiceClient.getLatestCommit(scmConnector, null, tag, scmBlockingStub));
       ScmResponseStatusUtils.checkScmResponseStatusAndThrowException(
           latestCommitResponse.getStatus(), latestCommitResponse.getError());
       return ScmGitRefTaskResponseData.builder()
