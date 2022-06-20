@@ -14,6 +14,7 @@ import static io.harness.logging.CommandExecutionStatus.FAILURE;
 import static io.harness.logging.CommandExecutionStatus.SUCCESS;
 import static io.harness.logging.LogLevel.ERROR;
 import static io.harness.rule.OwnerRule.ABOSII;
+import static io.harness.rule.OwnerRule.NAMAN_TALAYCHA;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -72,6 +73,7 @@ import io.harness.k8s.model.K8sPod;
 import io.harness.k8s.model.KubernetesConfig;
 import io.harness.k8s.model.KubernetesResource;
 import io.harness.k8s.model.KubernetesResourceId;
+import io.harness.k8s.model.Release;
 import io.harness.k8s.model.ReleaseHistory;
 import io.harness.logging.LogCallback;
 import io.harness.rule.Owner;
@@ -166,6 +168,44 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
     K8sDeployResponse response = k8sBGRequestHandler.executeTaskInternal(
         k8sBGDeployRequest, k8sDelegateTaskParams, logStreamingTaskClient, commandUnitsProgress);
 
+    assertThat(response.getCommandExecutionStatus()).isEqualTo(SUCCESS);
+    assertThat(response.getK8sNGTaskResponse()).isNotNull();
+    K8sBGDeployResponse bgDeployResponse = (K8sBGDeployResponse) response.getK8sNGTaskResponse();
+    assertThat(bgDeployResponse.getPrimaryColor()).isEqualTo(HarnessLabelValues.colorBlue);
+    assertThat(bgDeployResponse.getStageColor()).isEqualTo(HarnessLabelValues.colorGreen);
+    assertThat(bgDeployResponse.getPrimaryServiceName()).isEqualTo("my-service");
+    assertThat(bgDeployResponse.getStageServiceName()).isEqualTo("my-service-stage");
+    assertThat(bgDeployResponse.getK8sPodList()).isEqualTo(deployedPods);
+  }
+
+  @Test
+  @Owner(developers = NAMAN_TALAYCHA)
+  @Category(UnitTests.class)
+  public void testExecuteTaskInternalFFPruneOn() throws Exception {
+    final List<K8sPod> deployedPods = Collections.singletonList(K8sPod.builder().build());
+    final K8sBGDeployRequest k8sBGDeployRequest =
+        K8sBGDeployRequest.builder()
+            .skipResourceVersioning(true)
+            .k8sInfraDelegateConfig(k8sInfraDelegateConfig)
+            .manifestDelegateConfig(KustomizeManifestDelegateConfig.builder().build())
+            .pruningEnabled(true)
+            .releaseName("releaseName")
+            .build();
+    doReturn(HarnessLabelValues.colorBlue)
+        .when(k8sBGBaseHandler)
+        .getPrimaryColor(any(KubernetesResource.class), eq(kubernetesConfig), eq(logCallback));
+    doReturn(new ArrayList<>(asList(deployment(), service())))
+        .when(k8sTaskHelperBase)
+        .readManifests(anyListOf(FileData.class), eq(logCallback), eq(true));
+    doReturn(deployedPods)
+        .when(k8sBGBaseHandler)
+        .getAllPods(anyLong(), eq(kubernetesConfig), any(KubernetesResource.class), eq(HarnessLabelValues.colorBlue),
+            eq(HarnessLabelValues.colorGreen), eq("releaseName"));
+
+    K8sDeployResponse response = k8sBGRequestHandler.executeTaskInternal(
+        k8sBGDeployRequest, k8sDelegateTaskParams, logStreamingTaskClient, commandUnitsProgress);
+
+    verify(k8sBGBaseHandler, times(1)).pruneForBg(any(), any(), anyString(), anyString(), any(), any(), any());
     assertThat(response.getCommandExecutionStatus()).isEqualTo(SUCCESS);
     assertThat(response.getK8sNGTaskResponse()).isNotNull();
     K8sBGDeployResponse bgDeployResponse = (K8sBGDeployResponse) response.getK8sNGTaskResponse();
@@ -434,6 +474,41 @@ public class K8sBGRequestHandlerTest extends CategoryTest {
     KubernetesResource primaryService = on(k8sBGRequestHandler).get("primaryService");
     KubernetesResource stageService = on(k8sBGRequestHandler).get("stageService");
 
+    assertThat(primaryService.getResourceId().getName()).isEqualTo("my-service");
+    assertResourceColor(primaryService, HarnessLabelValues.colorGreen);
+    assertThat(stageService.getResourceId().getName()).isEqualTo("my-service-stage");
+    assertResourceColor(stageService, HarnessLabelValues.colorBlue);
+  }
+
+  @Test
+  @Owner(developers = NAMAN_TALAYCHA)
+  @Category(UnitTests.class)
+  public void testPrepareForBlueGreenFFPruneOn() throws Exception {
+    final List<KubernetesResource> resources = new ArrayList<>(asList(deployment(), service()));
+    final ReleaseHistory releaseHistory = ReleaseHistory.createNew();
+    final Kubectl client = Kubectl.client("", "");
+    // PrePruningInfo prePruningInfo = PrePruningInfo.builder().build();
+
+    on(k8sBGRequestHandler).set("resources", resources);
+    on(k8sBGRequestHandler).set("releaseName", "releaseName");
+    on(k8sBGRequestHandler).set("releaseHistory", releaseHistory);
+    on(k8sBGRequestHandler).set("client", client);
+    // on(k8sBGRequestHandler).set("prePruningInfo", prePruningInfo);
+
+    k8sBGRequestHandler.prepareForBlueGreen(k8sDelegateTaskParams, logCallback, false, true);
+
+    verify(k8sBGBaseHandler)
+        .cleanupForBlueGreen(k8sDelegateTaskParams, releaseHistory, logCallback, HarnessLabelValues.colorGreen,
+            HarnessLabelValues.colorBlue, releaseHistory.getLatestRelease(), client);
+
+    KubernetesResource primaryService = on(k8sBGRequestHandler).get("primaryService");
+    KubernetesResource stageService = on(k8sBGRequestHandler).get("stageService");
+    Release currentRelease = on(k8sBGRequestHandler).get("currentRelease");
+    PrePruningInfo prePruningInfo = on(k8sBGRequestHandler).get("prePruningInfo");
+
+    assertThat(prePruningInfo.getReleaseHistoryBeforeStageCleanUp()).isEqualTo(releaseHistory);
+    assertThat(currentRelease.getResources().get(0).getKind()).isNotEqualTo("Deployment");
+    assertThat(currentRelease.getResources().get(1).getKind()).isNotEqualTo("Deployment");
     assertThat(primaryService.getResourceId().getName()).isEqualTo("my-service");
     assertResourceColor(primaryService, HarnessLabelValues.colorGreen);
     assertThat(stageService.getResourceId().getName()).isEqualTo("my-service-stage");
