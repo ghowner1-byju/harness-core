@@ -21,12 +21,15 @@ import io.harness.annotations.dev.OwnedBy;
 import io.harness.beans.FeatureName;
 import io.harness.category.element.UnitTests;
 import io.harness.cdng.CDNGEntitiesTestBase;
+import io.harness.cdng.gitops.service.ClusterService;
 import io.harness.data.structure.UUIDGenerator;
 import io.harness.exception.InvalidRequestException;
 import io.harness.ng.core.environment.beans.Environment;
 import io.harness.ng.core.environment.dto.EnvironmentResponseDTO;
 import io.harness.ng.core.environment.mappers.EnvironmentMapper;
+import io.harness.ng.core.infrastructure.services.InfrastructureEntityService;
 import io.harness.ng.core.utils.CoreCriteriaUtils;
+import io.harness.repositories.UpsertOptions;
 import io.harness.rule.Owner;
 import io.harness.utils.NGFeatureFlagHelperService;
 import io.harness.utils.PageUtils;
@@ -43,6 +46,7 @@ import org.joor.Reflect;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,8 +54,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 @OwnedBy(HarnessTeam.CDC)
 public class EnvironmentServiceImplTest extends CDNGEntitiesTestBase {
+  @Mock private InfrastructureEntityService infrastructureEntityService;
   @Mock private NGFeatureFlagHelperService featureFlagHelperService;
-  @Inject EnvironmentServiceImpl environmentService;
+  @Mock private ClusterService clusterService;
+  @Inject @InjectMocks private EnvironmentServiceImpl environmentService;
 
   @Before
   public void setUp() throws Exception {
@@ -256,7 +262,7 @@ public class EnvironmentServiceImplTest extends CDNGEntitiesTestBase {
                                                .name("UPSERTED_ENV")
                                                .description("NEW_DESCRIPTION")
                                                .build();
-    Environment upsertEnv = environmentService.upsert(upsertEnvironmentRequest);
+    Environment upsertEnv = environmentService.upsert(upsertEnvironmentRequest, UpsertOptions.DEFAULT);
     assertThat(upsertEnv).isNotNull();
     assertThat(upsertEnv.getAccountId()).isEqualTo(upsertEnvironmentRequest.getAccountId());
     assertThat(upsertEnv.getOrgIdentifier()).isEqualTo(upsertEnvironmentRequest.getOrgIdentifier());
@@ -290,7 +296,8 @@ public class EnvironmentServiceImplTest extends CDNGEntitiesTestBase {
                                                        .name("UPSERTED_ENV")
                                                        .description("NEW_DESCRIPTION")
                                                        .build();
-    upsertEnv = environmentService.upsert(upsertEnvironmentRequestOrgLevel);
+    upsertEnv = environmentService.upsert(upsertEnvironmentRequestOrgLevel, UpsertOptions.DEFAULT);
+
     assertThat(upsertEnv).isNotNull();
     assertThat(upsertEnv.getAccountId()).isEqualTo(upsertEnvironmentRequest.getAccountId());
     assertThat(upsertEnv.getOrgIdentifier()).isEqualTo(upsertEnvironmentRequest.getOrgIdentifier());
@@ -316,6 +323,33 @@ public class EnvironmentServiceImplTest extends CDNGEntitiesTestBase {
     Optional<Environment> deletedEnvironment =
         environmentService.get("ACCOUNT_ID", "ORG_ID", "PROJECT_ID", "UPDATED_ENV", false);
     assertThat(deletedEnvironment.isPresent()).isFalse();
+  }
+
+  @Test
+  @Owner(developers = HINGER)
+  @Category(UnitTests.class)
+  public void testUpsertWithoutOutbox() {
+    Environment createEnvironmentRequest = Environment.builder()
+                                               .accountId("ACCOUNT_ID")
+                                               .identifier(UUIDGenerator.generateUuid())
+                                               .orgIdentifier("ORG_ID")
+                                               .projectIdentifier("PROJECT_ID")
+                                               .build();
+
+    Environment createdEnvironment = environmentService.create(createEnvironmentRequest);
+
+    Environment upsertRequest = Environment.builder()
+                                    .accountId("ACCOUNT_ID")
+                                    .identifier(createdEnvironment.getIdentifier())
+                                    .orgIdentifier("ORG_ID")
+                                    .projectIdentifier("PROJECT_ID")
+                                    .name("UPSERTED_ENV")
+                                    .description("NEW_DESCRIPTION")
+                                    .build();
+
+    Environment upsertedEnv = environmentService.upsert(upsertRequest, UpsertOptions.DEFAULT.withNoOutbox());
+
+    assertThat(upsertedEnv).isNotNull();
   }
 
   @Test
