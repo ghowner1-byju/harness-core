@@ -140,26 +140,6 @@ public class AnomalyAlertsServiceImpl implements AnomalyAlertsService {
     }
   }
 
-  @Override
-  public void testAnomalyAlerts() {
-    EmailChannelBuilder emailChannelBuilder = EmailChannel.builder()
-                                                  .accountId("kmpySmUISimoRrJL6NL73w")
-                                                  .recipients(Collections.singletonList("shubhanshu.verma@harness.io"))
-                                                  .team(Team.OTHER)
-                                                  .templateId("email_ccm_anomaly_alert.txt")
-                                                  .userGroups(Collections.emptyList());
-
-    Map<String, String> templateData = new HashMap<>();
-    templateData.put("perspective_name", "dawdad");
-    templateData.put("anomalies", "wwddeaew");
-    templateData.put("perspective_url", "perspective_url");
-
-    // Sending email alerts
-    emailChannelBuilder.templateData(templateData);
-    notificationResourceClient.sendNotification("", emailChannelBuilder.build());
-    log.info("done");
-  }
-
   private void checkAndSendNgAnomalyAlerts(String accountId, Instant date) {
     checkNotNull(accountId);
     List<CCMPerspectiveNotificationChannelsDTO> notificationSettings =

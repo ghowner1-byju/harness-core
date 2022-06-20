@@ -66,7 +66,6 @@ import io.harness.lock.noop.PersistentNoopLocker;
 import io.harness.metrics.modules.MetricsModule;
 import io.harness.metrics.service.api.MetricsPublisher;
 import io.harness.mongo.MongoConfig;
-import io.harness.notification.module.NotificationClientModule;
 import io.harness.notifications.NotificationResourceClientModule;
 import io.harness.persistence.HPersistence;
 import io.harness.pricing.client.CloudInfoPricingClientModule;
@@ -214,11 +213,5 @@ public class BatchProcessingModule extends AbstractModule {
   @Singleton
   MongoConfig mongoConfig(BatchMainConfig batchMainConfig) {
     return batchMainConfig.getHarnessMongo();
-  }
-
-  @Provides
-  @Singleton
-  public NotificationClientModule notificationClient(BatchMainConfig batchMainConfig) {
-    return new NotificationClientModule(batchMainConfig.getNotificationClientConfiguration());
   }
 }

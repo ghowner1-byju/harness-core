@@ -9,10 +9,7 @@ package io.harness.batch.processing.schedule;
 
 import static io.harness.logging.AutoLogContext.OverrideBehavior.OVERRIDE_ERROR;
 
-import static java.lang.String.format;
-
 import io.harness.batch.processing.YamlPropertyLoaderFactory;
-import io.harness.batch.processing.anomalydetection.alerts.service.itfc.AnomalyAlertsService;
 import io.harness.batch.processing.billing.timeseries.service.impl.BillingDataServiceImpl;
 import io.harness.batch.processing.billing.timeseries.service.impl.K8sUtilizationGranularDataServiceImpl;
 import io.harness.batch.processing.billing.timeseries.service.impl.PodCountComputationServiceImpl;
@@ -96,7 +93,6 @@ public class EventJobScheduler {
   @Autowired private AwsAccountTagsCollectionService awsAccountTagsCollectionService;
   @Autowired private UtilizationDataServiceImpl utilizationDataService;
   @Autowired private PodCountComputationServiceImpl podCountComputationService;
-  @Autowired private AnomalyAlertsService anomalyAlertsService;
 
   @PostConstruct
   public void orderJobs() {
@@ -347,12 +343,6 @@ public class EventJobScheduler {
     instanceDataService.logCacheStats();
     k8sLabelServiceInfoFetcher.logCacheStats();
     k8SWorkloadService.logCacheStats();
-  }
-
-  @Scheduled(cron = "0 * * ? * *")
-  public void anomalyTest() {
-    log.info("Running anomaly test");
-    anomalyAlertsService.testAnomalyAlerts();
   }
 
   @Scheduled(cron = "0 0 6 * * ?")
