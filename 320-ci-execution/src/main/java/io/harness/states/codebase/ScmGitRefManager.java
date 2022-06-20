@@ -37,7 +37,7 @@ public class ScmGitRefManager {
   @Inject private SecretUtils secretUtils;
 
   private final Duration RETRY_SLEEP_DURATION = Duration.ofSeconds(2);
-  private final int MAX_ATTEMPTS = 6;
+  private final int MAX_ATTEMPTS = 3;
 
   public ScmGitRefTaskResponseData fetchCodebaseMetadata(
       ScmConnector scmConnector, String connectorIdentifier, String branch, String prNumber, String tag) {
