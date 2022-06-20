@@ -56,7 +56,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -69,7 +68,6 @@ public class VariableServiceImpl implements VariableService {
   private final OutboxService outboxService;
   private final ProjectService projectService;
   private final OrganizationService organizationService;
-  @Inject private MongoTemplate mongoTemplate;
 
   @Inject
   public VariableServiceImpl(VariableRepository variableRepository, VariableMapper variableMapper,
