@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.joor.Reflect.on;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -58,10 +59,11 @@ import io.harness.rule.Owner;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.joor.Reflect;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -79,6 +81,7 @@ public class K8sRollingRequestHandlerTest extends CategoryTest {
   @Mock ILogStreamingTaskClient logStreamingTaskClient;
   @Mock LogCallback logCallback;
 
+  @Captor ArgumentCaptor<List<KubernetesResourceId>> captor;
   final CommandUnitsProgress commandUnitsProgress = CommandUnitsProgress.builder().build();
 
   @Before
@@ -171,7 +174,6 @@ public class K8sRollingRequestHandlerTest extends CategoryTest {
             .pruningEnabled(true)
             .manifestDelegateConfig(K8sManifestDelegateConfig.builder().build())
             .k8sInfraDelegateConfig(mock(K8sInfraDelegateConfig.class))
-
             .build();
     List<KubernetesResourceId> prunedResourceIds = singletonList(KubernetesResourceId.builder().build());
     doReturn(prunedResourceIds).when(rollingRequestHandler).prune(any(), any(), any());
@@ -186,6 +188,7 @@ public class K8sRollingRequestHandlerTest extends CategoryTest {
   @Owner(developers = ABHINAV2)
   @Category(UnitTests.class)
   public void testPruningWithNoResourceToPrune() throws Exception {
+    on(rollingRequestHandler).set("release", Release.builder().resourcesWithSpec(emptyList()).build());
     assertThat(rollingRequestHandler.prune(null, null, logCallback)).isEmpty();
 
     Release releaseWithEmptySpecs = Release.builder().resourcesWithSpec(emptyList()).build();
@@ -201,9 +204,11 @@ public class K8sRollingRequestHandlerTest extends CategoryTest {
   @Owner(developers = ABHINAV2)
   @Category(UnitTests.class)
   public void testPruning() throws Exception {
+    on(rollingRequestHandler).set("release", Release.builder().resourcesWithSpec(emptyList()).build());
     Release releaseWithDummySpec =
         Release.builder().resourcesWithSpec(singletonList(KubernetesResource.builder().build())).build();
-    List<KubernetesResourceId> toBePruned = singletonList(KubernetesResourceId.builder().build());
+    List<KubernetesResourceId> toBePruned = singletonList(
+        KubernetesResourceId.builder().kind("Deployment").name("test-deployment").versioned(false).build());
     doReturn(toBePruned)
         .when(taskHelperBase)
         .executeDeleteHandlingPartialExecution(any(Kubectl.class), any(K8sDelegateTaskParams.class),
@@ -211,6 +216,9 @@ public class K8sRollingRequestHandlerTest extends CategoryTest {
     doReturn(toBePruned)
         .when(taskHelperBase)
         .getResourcesToBePrunedInOrder(anyListOf(KubernetesResource.class), anyListOf(KubernetesResource.class));
-    assertThat(rollingRequestHandler.prune(null, releaseWithDummySpec, logCallback)).isEqualTo(toBePruned);
+    rollingRequestHandler.prune(null, releaseWithDummySpec, logCallback);
+    verify(taskHelperBase).executeDeleteHandlingPartialExecution(any(), any(), captor.capture(), any(), anyBoolean());
+
+    assertThat(captor.getValue().get(0)).isEqualTo(toBePruned.get(0));
   }
 }

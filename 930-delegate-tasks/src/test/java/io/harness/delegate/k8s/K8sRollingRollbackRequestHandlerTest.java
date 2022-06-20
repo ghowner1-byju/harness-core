@@ -179,10 +179,14 @@ public class K8sRollingRollbackRequestHandlerTest extends CategoryTest {
   @Owner(developers = ABHINAV2)
   @Category(UnitTests.class)
   public void testPruningWithRecreationFailed() throws Exception {
+    List<KubernetesResourceId> prunedResourceIds =
+        singletonList(KubernetesResourceId.builder().name("dummy_name").build());
     K8sRollingRollbackDeployRequest deployRequest = K8sRollingRollbackDeployRequest.builder()
                                                         .timeoutIntervalInMin(timeoutIntervalInMin)
                                                         .releaseNumber(1)
                                                         .pruningEnabled(true)
+                                                        .prunedResourceIds(prunedResourceIds)
+                                                        .k8sInfraDelegateConfig(mock(K8sInfraDelegateConfig.class))
                                                         .build();
     doThrow(new KubernetesTaskException("error"))
         .when(k8sRollingRollbackBaseHandler)
@@ -203,7 +207,9 @@ public class K8sRollingRollbackRequestHandlerTest extends CategoryTest {
         singletonList(KubernetesResourceId.builder().name("dummy_name").build());
     K8sRollingRollbackDeployRequest deployRequest = K8sRollingRollbackDeployRequest.builder()
                                                         .timeoutIntervalInMin(timeoutIntervalInMin)
+                                                        .releaseNumber(1)
                                                         .pruningEnabled(true)
+                                                        .k8sInfraDelegateConfig(mock(K8sInfraDelegateConfig.class))
                                                         .prunedResourceIds(prunedResourceIds)
                                                         .releaseNumber(1)
                                                         .build();
@@ -211,6 +217,10 @@ public class K8sRollingRollbackRequestHandlerTest extends CategoryTest {
         .when(k8sRollingRollbackBaseHandler)
         .recreatePrunedResources(any(K8sRollingRollbackHandlerConfig.class), anyInt(),
             anyListOf(KubernetesResourceId.class), any(LogCallback.class), any(K8sDelegateTaskParams.class));
+
+    doReturn(new HashSet<>(prunedResourceIds))
+        .when(k8sRollingRollbackBaseHandler)
+        .getResourcesRecreated(prunedResourceIds, RESOURCE_CREATION_SUCCESSFUL);
 
     k8sRollingRollbackRequestHandler.executeTaskInternal(
         deployRequest, k8sDelegateTaskParams, logStreamingTaskClient, null);
