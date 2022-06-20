@@ -547,6 +547,8 @@ roles:
         - core_file_view
         - core_file_access
         - core_variable_view
+        - core_template_view
+        - core_template_access
       allowedScopeLevels:
         - project
       managed: true
@@ -595,3 +597,12 @@ roles:
         - account
         - organization
         - project
+    - identifier: _account_basic
+      name: Account Basic
+      description: Account Basic
+      permissions:
+        - core_license_view
+        - core_account_view
+      managed: true
+      allowedScopeLevels:
+        - account
