@@ -38,6 +38,7 @@ public class DebeziumControllerStarter {
             DebeziumConfiguration.getDebeziumProperties(debeziumConfig, redisLockConfig, monitoredCollection),
             changeConsumer, locker, debeziumExecutorService);
         debeziumExecutorService.submit(debeziumController);
+        log.info("Starting Debezium Controller for Collection {} ...", monitoredCollection);
       } catch (Exception e) {
         log.error("Cannot Start Debezium Controller for Collection {}", monitoredCollection, e);
       }

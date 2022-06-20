@@ -61,6 +61,7 @@ public class DebeziumController<T extends MongoCollectionChangeConsumer> impleme
         debeziumEngine = getEngine(props);
         Future<?> future = executorService.submit(debeziumEngine);
         while (!future.isDone() && rLock.isHeldByCurrentThread()) {
+          log.info("Starting Debezium Engine for Collection {} ...", changeConsumer.getCollection());
           log.info("primary lock remaining ttl {}, isHeldByCurrentThread {}, holdCount {}, name {}",
               rLock.remainTimeToLive(), rLock.isHeldByCurrentThread(), rLock.getHoldCount(), rLock.getName());
           TimeUnit.SECONDS.sleep(30);
