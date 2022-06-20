@@ -583,7 +583,6 @@ public class NextGenModule extends AbstractModule {
       Set<Class<? extends MorphiaRegistrar>> morphiaRegistrars() {
         return ImmutableSet.<Class<? extends MorphiaRegistrar>>builder()
             .addAll(NextGenRegistrars.morphiaRegistrars)
-            .add(NGVariableMorphiaRegistrar.class)
             .build();
       }
 
