@@ -15,7 +15,7 @@ function download_apm_binaries(){
 	curl ${APPD_AGENT} --output ${APPD_AGENT##*/}; STATUS3=$?
 	echo "INFO: Download Status: ${APPD_AGENT##*/}: $STATUS3"
 
-	curl ${OCELET_AGENT} --output ${OCELET_AGENT##*/}; STATUS4=$?
+	curl -L ${OCELET_AGENT} --output ${OCELET_AGENT##*/}; STATUS4=$?
 	echo "INFO: Download Status: ${OCELET_AGENT##*/}: $STATUS4"
 
 	if [ "${STATUS1}" -eq 0 ] && [ "${STATUS2}" -eq 0 ] && [ "${STATUS3}" -eq 0 ] && [ "${STATUS4}" -eq 0 ]; then
@@ -46,7 +46,7 @@ function create_and_push_docker_build(){
    --build-arg REPO_PATH="${REPO_PATH}" --build-arg SERVICE_NAME="${local_service_name}" \
    --build-arg APPD_AGENT="${APPD_AGENT##*/}" --build-arg TAKIPI_AGENT="${TAKIPI_AGENT##*/}" \
    --build-arg OCELET_AGENT="${OCELET_AGENT##*/}" --build-arg ET_AGENT="${ET_AGENT##*/}" \
-   -f Dockerfile .; STATUS1=$?
+   -f featureBuilds.dockerfile .; STATUS1=$?
 
   echo "INFO: Pushing APM IMAGE...."
 	docker push "${local_feature_image_path}"; STATUS2=$?
