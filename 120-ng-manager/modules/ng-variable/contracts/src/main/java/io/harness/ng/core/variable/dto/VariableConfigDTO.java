@@ -30,5 +30,7 @@ public abstract class VariableConfigDTO {
   public static final String REGEX_VALUE_FORMAT = "<+input>.regex(%s)";
   @Schema(description = VariableConstants.VARIABLE_VALUE_TYPE) @NotNull VariableValueType valueType;
   public abstract Object getValue();
-  public void validate(){};
+  public void validate() {
+    // no op implementation
+  }
 }
