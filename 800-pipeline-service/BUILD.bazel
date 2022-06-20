@@ -146,6 +146,7 @@ java_library(
         "//980-commons:tests",
         "//990-commons-test:module",
         "//clients/audit:module",
+        "//clients/ng-variable:module",
         "//clients/notification:module",
         "//platform-service/modules/notification-service/contracts:module",
         "@maven//:io_grpc_grpc_testing",
