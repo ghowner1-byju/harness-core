@@ -36,7 +36,6 @@ import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 public class AwsS3SyncServiceImpl implements AwsS3SyncService {
   @Inject BatchMainConfig configuration;
 
-  private static final int SYNC_TIMEOUT_MINUTES = 15;
   private static final String AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID";
   private static final String AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY";
   private static final String AWS_DEFAULT_REGION = "AWS_DEFAULT_REGION";
@@ -63,6 +62,14 @@ public class AwsS3SyncServiceImpl implements AwsS3SyncService {
           ImmutableMap.of(AWS_ACCESS_KEY_ID, credentials.get("AccessKeyId").getAsString(), AWS_SECRET_ACCESS_KEY,
               credentials.get("SecretAccessKey").getAsString(), AWS_DEFAULT_REGION, awsCredentials.getRegion(),
               SESSION_TOKEN, credentials.get("SessionToken").getAsString());
+
+      final ArrayList<String> maxConcurrentRequestsCmd =
+          Lists.newArrayList("aws", "configure", "set", "default.s3.max_concurrent_requests", "20");
+      setAwsS3TransferConfig(maxConcurrentRequestsCmd, roleEnvVariables);
+
+      final ArrayList<String> multipartChunkSizeCmd =
+          Lists.newArrayList("aws", "configure", "set", "default.s3.multipart_chunksize", "16MB");
+      setAwsS3TransferConfig(multipartChunkSizeCmd, roleEnvVariables);
 
       JsonObject assumedRoleUser = new Gson()
                                        .fromJson(processResult.getOutput().getString(), JsonObject.class)
@@ -99,12 +106,18 @@ public class AwsS3SyncServiceImpl implements AwsS3SyncService {
     getProcessExecutor()
         .command(cmd)
         .environment(roleEnvVariables)
-        .timeout(SYNC_TIMEOUT_MINUTES, TimeUnit.MINUTES)
+        .timeout(configuration.getAwsS3SyncConfig().getAwsS3SyncTimeoutMinutes(), TimeUnit.MINUTES)
         .redirectOutput(Slf4jStream.of(log).asInfo())
         .exitValue(0) // Throws exception when a non zero return code is found
         .readOutput(true)
         .execute();
     log.info("s3 sync completed");
+  }
+
+  public void setAwsS3TransferConfig(ArrayList<String> cmd, ImmutableMap<String, String> roleEnvVariables)
+      throws InterruptedException, TimeoutException, IOException {
+    log.info("Setting AWS-S3-Transfer config, running command: '{}'...", cmd);
+    getProcessExecutor().command(cmd).environment(roleEnvVariables).exitValue(0).readOutput(true).execute();
   }
 
   ProcessExecutor getProcessExecutor() {
