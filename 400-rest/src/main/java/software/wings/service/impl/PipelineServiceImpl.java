@@ -2094,36 +2094,43 @@ public class PipelineServiceImpl implements PipelineService {
     }
     Set<String> userGroups = new HashSet<>();
     for (PipelineStage bean : pipeline.getPipelineStages()) {
-      PipelineStageElement stageElement = bean.getPipelineStageElements().get(0);
-      if (StateType.APPROVAL.name().equals(stageElement.getType())) {
-        Map<String, Object> properties = stageElement.getProperties();
-        properties.forEach((name, value) -> {
-          if (USER_GROUPS.equals(name) && value instanceof List && isNotEmpty((List<String>) value)) {
-            userGroups.addAll((List<String>) value);
-          }
-        });
-      } else {
-        String workflowId = (String) stageElement.getProperties().get("workflowId");
-        Workflow workflow = getWorkflow(pipeline, workflowCache, workflowId);
-        workflowCache.put(workflowId, workflow);
-        List<String> userGroupVariableNames = workflow.getOrchestrationWorkflow()
-                                                  .getUserVariables()
-                                                  .stream()
-                                                  .filter(v -> USER_GROUP.equals(v.obtainEntityType()))
-                                                  .map(Variable::getName)
-                                                  .collect(toList());
-        if (isNotEmpty(stageElement.getWorkflowVariables()) && isNotEmpty(userGroupVariableNames)) {
-          stageElement.getWorkflowVariables().forEach((variable, value) -> {
-            if (userGroupVariableNames.contains(variable)) {
-              if (!ExpressionEvaluator.matchesVariablePattern(value)) {
-                if (value.contains(",")) {
-                  userGroups.addAll(Arrays.asList(value.split(",")));
-                } else {
-                  userGroups.add(value);
-                }
-              }
+      for (PipelineStageElement stageElement : bean.getPipelineStageElements()) {
+        if (StateType.APPROVAL.name().equals(stageElement.getType())) {
+          Map<String, Object> properties = stageElement.getProperties();
+          properties.forEach((name, value) -> {
+            if (USER_GROUPS.equals(name) && value instanceof List && isNotEmpty((List<String>) value)) {
+              userGroups.addAll((List<String>) value);
             }
           });
+        } else {
+          if (stageElement.getRuntimeInputsConfig() != null) {
+            List<String> userGroupIds = stageElement.getRuntimeInputsConfig().getUserGroupIds();
+            for (String id : userGroupIds) {
+              userGroups.add(id);
+            }
+          }
+          String workflowId = (String) stageElement.getProperties().get("workflowId");
+          Workflow workflow = getWorkflow(pipeline, workflowCache, workflowId);
+          workflowCache.put(workflowId, workflow);
+          List<String> userGroupVariableNames = workflow.getOrchestrationWorkflow()
+                                                    .getUserVariables()
+                                                    .stream()
+                                                    .filter(v -> USER_GROUP.equals(v.obtainEntityType()))
+                                                    .map(Variable::getName)
+                                                    .collect(toList());
+          if (isNotEmpty(stageElement.getWorkflowVariables()) && isNotEmpty(userGroupVariableNames)) {
+            stageElement.getWorkflowVariables().forEach((variable, value) -> {
+              if (userGroupVariableNames.contains(variable)) {
+                if (!ExpressionEvaluator.matchesVariablePattern(value)) {
+                  if (value.contains(",")) {
+                    userGroups.addAll(Arrays.asList(value.split(",")));
+                  } else {
+                    userGroups.add(value);
+                  }
+                }
+              }
+            });
+          }
         }
       }
     }
