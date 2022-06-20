@@ -14,7 +14,6 @@ import static io.harness.data.structure.UUIDGenerator.generateUuid;
 import static io.harness.exception.WingsException.USER;
 import static io.harness.reflection.ReflectionUtils.getFieldByName;
 import static io.harness.security.SimpleEncryption.CHARSET;
-import static io.harness.security.encryption.EncryptionType.LOCAL;
 
 import static java.lang.String.format;
 
@@ -36,7 +35,6 @@ import io.harness.ng.core.BaseNGAccess;
 import io.harness.secretmanagerclient.services.api.SecretManagerClientService;
 import io.harness.security.SimpleEncryption;
 import io.harness.security.encryption.EncryptedDataDetail;
-import io.harness.security.encryption.EncryptedRecordData;
 import io.harness.security.encryption.EncryptionConfig;
 import io.harness.security.encryption.EncryptionType;
 import io.harness.utils.IdentifierRefHelper;
@@ -45,7 +43,6 @@ import software.wings.service.intfc.security.SecretManager;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,9 +137,7 @@ public class NgSecretManagerFunctor implements ExpressionFunctor, NgSecretManage
         throw new InvalidRequestException("No secret found with identifier + [" + secretIdentifier + "]", USER);
       }
       EncryptedDataDetails objectToCache =
-          EncryptedDataDetails.builder()
-          .encryptedDataDetailList(encryptedDataDetails)
-          .build();
+          EncryptedDataDetails.builder().encryptedDataDetailList(encryptedDataDetails).build();
       secretsCache.put(String.valueOf(keyHash), objectToCache);
     }
 
