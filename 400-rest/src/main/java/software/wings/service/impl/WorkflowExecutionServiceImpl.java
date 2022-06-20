@@ -6317,7 +6317,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
     return PreviousApprovalDetails.builder().previousApprovals(Collections.emptyList()).size(0).build();
   }
 
-  private List<String> getPreviousApprovalIdsWithSameServicesAndInfraForWorkflow(WorkflowExecution currentExecution,
+   List<String> getPreviousApprovalIdsWithSameServicesAndInfraForWorkflow(WorkflowExecution currentExecution,
       List<WorkflowExecution> pausedExecutions, List<String> serviceIds, List<String> infraIds,
       String currentApprovalId) {
     List<WorkflowExecution> executionsWithSameServiceAndInfra =
@@ -6328,7 +6328,7 @@ public class WorkflowExecutionServiceImpl implements WorkflowExecutionService {
             .collect(toList());
     List<String> approvalIds = new ArrayList<>();
 
-    // Removing workflow executions from the same pipeline
+    // Removing workflow executions from the same pipeline execution
     if (currentExecution.getPipelineExecutionId() != null) {
       executionsWithSameServiceAndInfra.removeIf(
           e -> currentExecution.getPipelineExecutionId().equals(e.getPipelineExecutionId()));
