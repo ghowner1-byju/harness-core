@@ -8,6 +8,7 @@
 package io.harness.delegate.service;
 
 import static io.harness.beans.FeatureName.USE_IMMUTABLE_DELEGATE;
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
 import static io.harness.delegate.beans.DelegateType.CE_KUBERNETES;
 import static io.harness.delegate.beans.DelegateType.KUBERNETES;
 import static io.harness.delegate.beans.VersionOverrideType.DELEGATE_IMAGE_TAG;
@@ -16,7 +17,6 @@ import static io.harness.delegate.beans.VersionOverrideType.UPGRADER_IMAGE_TAG;
 import static io.harness.delegate.beans.VersionOverrideType.WATCHER_JAR;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import io.harness.delegate.beans.VersionOverride;
 import io.harness.delegate.beans.VersionOverride.VersionOverrideKeys;
