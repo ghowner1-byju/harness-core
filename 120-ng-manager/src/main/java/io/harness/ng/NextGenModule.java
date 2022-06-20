@@ -245,7 +245,6 @@ import io.harness.serializer.KryoRegistrar;
 import io.harness.serializer.ManagerRegistrars;
 import io.harness.serializer.NextGenRegistrars;
 import io.harness.serializer.kryo.KryoConverterFactory;
-import io.harness.serializer.morphia.NGVariableMorphiaRegistrar;
 import io.harness.service.DelegateServiceDriverModule;
 import io.harness.service.InstanceModule;
 import io.harness.service.stats.usagemetrics.eventconsumer.InstanceStatsEventListener;
