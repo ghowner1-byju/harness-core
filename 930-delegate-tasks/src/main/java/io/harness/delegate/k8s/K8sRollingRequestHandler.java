@@ -25,6 +25,7 @@ import static io.harness.k8s.manifest.ManifestHelper.getWorkloads;
 import static io.harness.k8s.manifest.VersionUtils.markVersionedResources;
 import static io.harness.logging.CommandExecutionStatus.SUCCESS;
 import static io.harness.logging.LogLevel.INFO;
+import static io.harness.logging.LogLevel.WARN;
 
 import static software.wings.beans.LogColor.Cyan;
 import static software.wings.beans.LogColor.White;
@@ -201,7 +202,7 @@ public class K8sRollingRequestHandler extends K8sRequestHandler {
       String logCallbackMessage = previousSuccessfulRelease == null
           ? "No previous successful deployment found, So no pruning required"
           : "Previous successful deployment executed with pruning disabled, Pruning can't be done";
-      executionLogCallback.saveExecutionLog(logCallbackMessage, INFO, CommandExecutionStatus.SUCCESS);
+      executionLogCallback.saveExecutionLog(logCallbackMessage, WARN, CommandExecutionStatus.SUCCESS);
       return emptyList();
     }
 
