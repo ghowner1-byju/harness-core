@@ -1937,7 +1937,7 @@ public class WorkflowExecutionServiceTest extends WingsBaseTest {
     when(wingsPersistence.getWithAppId(WorkflowExecution.class, APP_ID, WORKFLOW_EXECUTION_ID))
         .thenReturn(workflowExecution);
     when(featureFlagService.isEnabled(AUTO_REJECT_PREVIOUS_APPROVALS, ACCOUNT_ID)).thenReturn(true);
-    when(subdomainUrlHelper.getApiBaseUrl(anyString())).thenReturn("");
+    when(subdomainUrlHelper.getPortalBaseUrl(anyString())).thenReturn("https://dummyurl");
 
     doNothing().when(workflowExecutionServiceSpy).refreshPipelineExecution(workflowExecution);
     workflowExecutionServiceSpy.approveAndRejectPreviousExecutions(
@@ -1954,6 +1954,7 @@ public class WorkflowExecutionServiceTest extends WingsBaseTest {
     assertThat(((ApprovalStateExecutionData) captor1.getValue()).getStatus()).isEqualTo(SUCCESS);
     assertThat(((ApprovalStateExecutionData) captor2.getValue()).getStatus()).isEqualTo(REJECTED);
     assertThat(((ApprovalStateExecutionData) captor3.getValue()).getStatus()).isEqualTo(REJECTED);
+    assertThat(((ApprovalStateExecutionData) captor2.getValue()).getComments()).isEqualTo("Pipeline rejected when the following execution was approved: https://dummyurl/#/account/ACCOUNT_ID/app/APP_ID/pipeline-execution/WORKFLOW_EXECUTION_ID/workflow-execution/undefined/details");
     UserThreadLocal.unset();
   }
 
